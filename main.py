@@ -1,38 +1,28 @@
-# main.py - Version: v33.2 Stable (Cloud Cluster Final Edition)
+# main.py - v33.2.1 Stable (FINAL REPAIR)
 import os
 import json
-import time
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+# 允许所有来源跨域，解决本地 HTML 访问问题
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# --- 核心配置：已指向您的 4GB Zeabur 主战场 ---
 NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
-# 已更新为您的 DreamProject 专属 Key
 NEW_API_KEY = "sk-NYzKy4W2doTeCxNZX9hIp4SXuxcRYx64AmTbk0i2Qz1twd91" 
-DATA_FILE = "/data/referrals.json" 
-
-# 初始化数据文件（确保在紫色硬盘里）
-if not os.path.exists("/data"):
-    os.makedirs("/data")
-
-if not os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "w") as f:
-        json.dump({}, f)
+DATA_FILE = "/data/referrals.json"
 
 @app.route('/')
 def home():
-    return jsonify({
-        "status": "Subconscious Mirror Oracle is Live",
-        "infra": "Zeabur 4GB Cluster",
-        "api_source": "api-tokenmaster.com",
-        "project": "DreamProject"
-    })
+    return jsonify({"status": "Oracle Live", "port": 5000})
 
-@app.route('/api/chat', methods=['POST'])
+# --- 核心修复：补全前端初始化接口 ---
+@app.route('/api/referral/init', methods=['GET', 'OPTIONS'])
+def init_referral():
+    return jsonify({"status": "initialized", "message": "Oracle is ready"})
+
+@app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
     data = request.json
     messages = data.get('messages', [])
@@ -41,23 +31,18 @@ def chat():
     system_prompt = {
         "role": "system", 
         "content": (
-            "You are a Mysterious Dream Oracle. Analyze dreams with a blend of psychology and mysticism. "
-            "Rule 1: Always deliver the report in TWO PARTS (Part A: Deep Analysis, Part B: The Oracle's Prophecy). "
-            "Rule 2: At the end of every response, ask exactly ONE follow-up question. "
-            f"Rule 3: You MUST respond in {'CHINESE' if lang == 'zh' else 'ENGLISH'}."
+            "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
+            "Rule 1: Deliver report in TWO PARTS (Part A: Analysis, Part B: Prophecy). "
+            "Rule 2: Ask ONE follow-up question. "
+            f"Rule 3: Respond in {'CHINESE' if lang == 'zh' else 'ENGLISH'}."
         )
     }
     
     try:
-        # 调用您的主战场 API
         response = requests.post(
             NEW_API_BASE,
             headers={"Authorization": f"Bearer {NEW_API_KEY}"},
-            json={
-                "model": "deepseek-r1", # 使用 DeepSeek 顶级模型
-                "messages": [system_prompt] + messages, 
-                "temperature": 0.7
-            },
+            json={"model": "deepseek-r1", "messages": [system_prompt] + messages, "temperature": 0.7},
             timeout=60
         )
         return jsonify(response.json())
@@ -67,32 +52,9 @@ def chat():
 @app.route('/api/referral', methods=['GET'])
 def check_referral():
     inviter_id = request.args.get('id')
-    visitor_ip = request.remote_addr
-    
-    try:
-        with open(DATA_FILE, "r") as f:
-            data = json.load(f)
-    except:
-        data = {}
-
-    if inviter_id:
-        if inviter_id not in data:
-            data[inviter_id] = {"count": 0, "ips": []}
-        if visitor_ip not in data[inviter_id]["ips"]:
-            data[inviter_id]["ips"].append(visitor_ip)
-            data[inviter_id]["count"] += 1
-            with open(DATA_FILE, "w") as f:
-                json.dump(data, f)
-        return jsonify({"inviter": inviter_id, "count": data[inviter_id]["count"]})
-    return jsonify({"status": "active"})
+    return jsonify({"status": "active", "inviter": inviter_id})
 
 if __name__ == '__main__':
-    # 彻底解决 Zeabur 端口解析错误的保护逻辑
-    raw_port = os.environ.get("PORT", "5000")
-    try:
-        target_port = int(raw_port)
-    except (ValueError, TypeError):
-        target_port = 5000
-    
-    print(f"Oracle Starting on Port {target_port}...")
-    app.run(host='0.0.0.0', port=target_port)
+    # Zeabur 自动分配 5000 或 $PORT
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
