@@ -74,7 +74,7 @@ def chat():
                 "Content-Type": "application/json"
             },
             json={
-                "model": "deepseek-r1", # 已经在主战场配置了映射
+                "model": "deepseek-reasoner", # 已经在主战场配置了映射
                 "messages": [system_prompt] + messages,
                 "temperature": 0.7
             },
