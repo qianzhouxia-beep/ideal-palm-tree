@@ -142,6 +142,10 @@
                 </div>
 
                 <div id="final-report" class="hidden space-y-12 py-10">
+                    <div class="text-center pt-8 pb-4">
+                        <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center text-black font-display italic text-3xl mx-auto mb-6 shadow-2xl">SM</div>
+                        <h2 class="text-4xl md:text-6xl font-display italic text-white" id="t-destiny-report">Destiny Report</h2>
+                    </div>
                     <div class="space-y-4">
                         <h4 class="text-[10px] text-gray-500 uppercase tracking-widest flex items-center gap-2" id="t-res-psych">
                             <span class="text-accent text-lg">🧠</span> Psychology Analysis
@@ -163,10 +167,21 @@
                             <div class="text-center p-10 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[32px] max-w-sm mx-auto shadow-2xl">
                                 <p class="text-xs text-gray-400 uppercase tracking-[0.2em] mb-6" id="t-unlock-msg">Unlock your full destiny path</p>
                                 <div class="flex flex-col gap-4">
-                                    <button onclick="openPayOverlay('https://tokenmasterglobal.lemonsqueezy.com/checkout/buy/39dc3938-07a6-4a2e-a89f-fd217b3d31f3')" 
+                                    <button onclick="openPayOverlay('https://apitokenmaster.gumroad.com/l/sm-destiny')" 
                                        class="inline-block w-full px-10 py-5 bg-accent text-bg rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-accent/20" id="t-unlock-btn">
                                         Unlock Full Report ($4.99)
                                     </button>
+                                    <div id="license-area" class="mt-2">
+                                        <button onclick="showLicenseInput()" class="text-[9px] text-white/40 hover:text-white uppercase tracking-widest transition-all" id="t-have-key">Already have a license key?</button>
+                                        <div id="license-input-wrapper" class="hidden mt-4 space-y-3">
+                                            <input type="text" id="t-key-placeholder" 
+                                                class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:border-accent transition-all outline-none">
+                                            <button onclick="verifyLicense()" id="t-verify-btn"
+                                                class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] uppercase tracking-widest transition-all">
+                                                Verify Key
+                                            </button>
+                                        </div>
+                                    </div>
                                     <button onclick="openReferralModal()" class="text-[9px] text-white/40 hover:text-white uppercase tracking-widest transition-all" id="t-ref-btn">Invite 2 friends to unlock for free</button>
                                 </div>
                             </div>
@@ -284,10 +299,12 @@
                 tier3_f1: "Unlimited Monthly Access", tier3_f2: "DeepSeek R1 High-Priority", tier3_f3: "Nous Hermes 3 Integration",
                 select_0: "Select Plan", select_1: "Select Plan", select_2: "Select Plan",
                 unlock_msg: "Unlock your full destiny path", unlock_btn: "Unlock Full Report ($4.99)",
+                have_key: "Already have a license key?", verify_btn: "Verify Key", key_placeholder: "Enter License Key",
                 ref_btn: "Invite 2 friends to unlock for free", ref_modal_title: "Pass the Spark", ref_modal_desc: "Share this magical mirror with 2 friends. When they begin their journey, your full destiny path will be revealed for free.",
                 copy_btn: "Copy", copied: "Copied!", sc_title: "Oracle Engine", sc_sync: "Quantum Logic Sync: Active", sc_recharge: "Recharge Energy ↗", turn_label: "Connection", slow_thought: "The oracle is traversing the dream realm...", error_ether: "The connection to the ether has flickered.",
-                ref_status_text: "Journeyers joined: ", footer_terms: "USAGE TERMS", footer_privacy: "PRIVACY POLICY", footer_copy: "&copy; 2026 TokenMaster Global. All rights reserved.",
+                ref_status_text: "Journeyers joined: ", footer_terms: "USAGE TERMS", footer_privacy: "PRIVACY POLICY", footer_copy: "&copy; 2026 TokenMaster Global. All rights reserved. <a href='https://api-tokenmaster.com' target='_blank' class='ml-4 hover:text-white transition-all underline underline-offset-4'>Powered by TokenMaster</a>",
                 res_psych: "<span class='text-accent text-lg'>🧠</span> Psychology Analysis",
+                destiny_report: "Destiny Report",
                 gen_img: "Generate Dream Image",
                 res_destiny: "<span class='text-accent text-lg'>🔮</span> Eastern Destiny Path",
                 modal_terms: `
@@ -319,10 +336,12 @@
                 tier3_f1: "本月无限次访问", tier3_f2: "DeepSeek R1高优先级", tier3_f3: "Nous Hermes 3 深度集成",
                 select_0: "选择方案", select_1: "选择方案", select_2: "选择方案",
                 unlock_msg: "开启您的完整命运路径", unlock_btn: "解锁完整报告 ($4.99)",
+                have_key: "已有激活码？", verify_btn: "验证激活码", key_placeholder: "输入激活码",
                 ref_btn: "邀请2位好友免费解锁", ref_modal_title: "传递灵光", ref_modal_desc: "与2位好友分享这面魔镜。当他们开启旅程时，您的完整命运路径将免费点亮。",
                 copy_btn: "复制", copied: "已复制", sc_title: "神谕引擎", sc_sync: "量子逻辑同步：活跃", sc_recharge: "补充能量 ↗", turn_label: "连接进度", slow_thought: "神谕正在穿越梦境领域...", error_ether: "以太连接出现波动。",
-                ref_status_text: "已加入的旅人: ", footer_terms: "使用条款", footer_privacy: "隐私政策", footer_copy: "&copy; 2026 TokenMaster Global. 版权所有。",
+                ref_status_text: "已加入的旅人: ", footer_terms: "使用条款", footer_privacy: "隐私政策", footer_copy: "&copy; 2026 TokenMaster Global. 版权所有。<a href='https://api-tokenmaster.com' target='_blank' class='ml-4 hover:text-white transition-all underline underline-offset-4'>由 TokenMaster 提供技术支持</a>",
                 res_psych: "<span class='text-accent text-lg'>🧠</span> 心理学解析",
+                destiny_report: "解梦报告",
                 gen_img: "生成梦境画像",
                 res_destiny: "<span class='text-accent text-lg'>🔮</span> 东方命理路径",
                 modal_terms: `
@@ -418,6 +437,12 @@
         }
 
         async function checkReferralStatus() {
+            // Check local premium status first
+            if (localStorage.getItem('sm_premium') === 'true') {
+                document.getElementById('res-paid-blur').classList.remove('blurred');
+                document.getElementById('pay-overlay').classList.add('hidden');
+                return;
+            }
             if (!refId) return;
             try {
                 const res = await fetch(`${API_BASE}/api/referral/status?refId=${refId}`);
@@ -441,6 +466,45 @@
                 indicator.innerText = `${i18n[currentLang].turn_label} ${turnCount} / 5`;
                 indicator.style.opacity = "1";
             } else indicator.style.opacity = "0";
+        }
+
+        function showLicenseInput() {
+            document.getElementById('license-input-wrapper').classList.remove('hidden');
+            document.getElementById('t-have-key').classList.add('hidden');
+        }
+
+        async function verifyLicense() {
+            const key = document.getElementById('t-key-placeholder').value.trim();
+            const btn = document.getElementById('t-verify-btn');
+            if (!key) return;
+
+            btn.disabled = true;
+            btn.innerText = currentLang === 'en' ? "Verifying..." : "验证中...";
+
+            try {
+                const res = await fetch(`${API_BASE}/api/verify-license`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ license_key: key })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.status === 'unlocked') {
+                    localStorage.setItem('sm_premium', 'true');
+                    localStorage.setItem('sm_email', data.email);
+                    document.getElementById('res-paid-blur').classList.remove('blurred');
+                    document.getElementById('pay-overlay').classList.add('hidden');
+                    // 刷新状态卡片
+                    checkReferralStatus();
+                } else {
+                    alert(data.message || "Verification failed");
+                }
+            } catch (e) {
+                alert("Connection error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = i18n[currentLang].verify_btn;
+            }
         }
 
         function resetOracle() {
