@@ -42,24 +42,36 @@ def index():
         return send_file(HTML_FILE)
     return "<h1>Mirror Sanctum Error: HTML File Missing</h1>", 404
 
-@app.route('/api/referral/init', methods=['GET', 'OPTIONS'])
+@app.route('/api/referral/init', methods=['POST', 'OPTIONS'])
 def init_ref():
-    return _cors(jsonify({"status": "ready"}))
+    if request.method == 'OPTIONS': return _cors(make_response())
+    # Generate a simple unique ID for referral
+    ref_id = f"ref_{int(time.time())}_{os.urandom(2).hex()}"
+    data = load_json(DATA_FILE)
+    data[ref_id] = {"count": 0, "ips": []}
+    save_json(DATA_FILE, data)
+    return _cors(jsonify({"status": "ready", "refId": ref_id}))
 
-@app.route('/api/referral', methods=['GET'])
-def manage_referral():
-    inviter_id = request.args.get('id')
+@app.route('/api/referral/status', methods=['GET'])
+def referral_status():
+    ref_id = request.args.get('refId')
+    data = load_json(DATA_FILE)
+    if ref_id in data:
+        return _cors(jsonify({"count": data[ref_id]["count"]}))
+    return _cors(jsonify({"count": 0}))
+
+@app.route('/api/referral/click', methods=['POST'])
+def referral_click():
+    inviter_id = request.json.get('refBy')
     visitor_ip = request.remote_addr
     data = load_json(DATA_FILE)
-    if inviter_id:
-        if inviter_id not in data:
-            data[inviter_id] = {"count": 0, "ips": []}
+    if inviter_id and inviter_id in data:
         if visitor_ip not in data[inviter_id]["ips"]:
             data[inviter_id]["ips"].append(visitor_ip)
             data[inviter_id]["count"] += 1
             save_json(DATA_FILE, data)
-        return _cors(jsonify({"count": data[inviter_id]["count"]}))
-    return _cors(jsonify({"status": "active"}))
+            return _cors(jsonify({"status": "counted", "count": data[inviter_id]["count"]}))
+    return _cors(jsonify({"status": "ignored"}))
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
@@ -68,9 +80,9 @@ def chat():
     messages = req_data.get('messages', [])
     lang = req_data.get('lang', 'zh')
     
-    # Logic: User (1) -> Oracle (1) -> User (2) -> Oracle (2) -> User (3) -> Report (3)
+    # Logic: User (1-4) -> Oracle (1-4) -> User (5) -> Report (5)
     user_msg_count = len([m for m in messages if m['role'] == 'user'])
-    mode = 'question' if user_msg_count < 3 else 'report'
+    mode = 'question' if user_msg_count < 5 else 'report'
 
     system_content = (
         "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
