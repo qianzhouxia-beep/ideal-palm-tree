@@ -79,9 +79,11 @@ def chat():
     if mode == 'question':
         system_content += "Rule: Ask exactly ONE short, provocative follow-up question to dig deeper."
     else:
+        part_a = "心理学解析" if lang == 'zh' else "Psychological Analysis"
+        part_b = "神谕命运路径" if lang == 'zh' else "The Oracle's Prophecy"
         system_content += (
-            "Rule: Deliver a final report in TWO PARTS. "
-            "PART A: [Psychological Analysis]. PART B: [The Oracle's Prophecy]. "
+            f"Rule: Deliver a final report in TWO PARTS. "
+            f"PART A: [{part_a}]. PART B: [{part_b}]. "
             "Separate them with the string '---PROPHECY_START---'."
         )
 
@@ -100,8 +102,9 @@ def chat():
             return _cors(jsonify({"mode": "question", "content": text}))
         else:
             parts = text.split('---PROPHECY_START---')
-            free = parts[0].replace('PART A:', '').strip()
-            paid = parts[1].replace('PART B:', '').strip() if len(parts) > 1 else "The destiny is veiled..."
+            # Handle possible variations in header naming by the AI
+            free = parts[0].replace('PART A:', '').replace('[Psychological Analysis]', '').replace('[心理学解析]', '').replace('**[Psychological Analysis]**', '').replace('**[心理学解析]**', '').strip()
+            paid = parts[1].replace('PART B:', '').replace("[The Oracle's Prophecy]", '').replace('[神谕命运路径]', '').replace("**[The Oracle's Prophecy]**", '').replace('**[神谕命运路径]**', '').strip() if len(parts) > 1 else "The destiny is veiled..."
             return _cors(jsonify({
                 "mode": "report", 
                 "content": "The veil is lifted.", 
