@@ -84,6 +84,7 @@ def chat():
     user_msg_count = len([m for m in messages if m['role'] == 'user'])
     mode = 'question' if user_msg_count < 5 else 'report'
 
+    warning_msg = "再这样我就生气了😡！" if lang == 'zh' else "Don't make me angry! 😡"
     system_content = (
         "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
         "Maintain a vibe of ancient mystery but be 'smart' and witty. "
@@ -91,7 +92,7 @@ def chat():
         "do not be overly solemn. Respond with wit, gentle irony, or humor while staying in character as a cryptic sage. "
         "Acknowledge their 'minimalist' approach (e.g., 'A dream as brief as a single breath...', 'You are being stingy with your subconscious treasures...') "
         "before asking a provocative follow-up. "
-        "If they are being persistent with nonsense or laziness, you can end with a humorous warning like '再这样我就生气了😡！'. "
+        f"If they are being persistent with nonsense or laziness, you can end with a humorous warning like '{warning_msg}'. "
         f"IMPORTANT: You MUST respond in {'CHINESE' if lang == 'zh' else 'ENGLISH'}. "
     )
     if mode == 'question':
