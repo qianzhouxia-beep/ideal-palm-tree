@@ -1,4 +1,4 @@
-# main.py - Version: v33.2.9 (PRODUCTION REASONER EDITION)
+# main.py - Version: v33.2.10 (FINAL BATTLE-READY EDITION)
 import os
 import requests
 from flask import Flask, request, jsonify, make_response, send_file
@@ -8,9 +8,9 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
-# --- 核心配置区 ---
+# --- 核心配置区：使用您刚刚测试成功的黄金钥匙 ---
 NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
-# 请确保使用完整的 sk-xxxx 密钥
+# 这里填入您刚刚生成的 Mirror API 完整密钥
 NEW_API_KEY = "sk-biaE1BokgWzky0VkQwX3DuiVCThyVjIlf9BxejJSGi3U0M8j" 
 HTML_FILE = "dream_pro_landing_v33_referral.html"
 
@@ -27,7 +27,7 @@ def serve_index():
 
 @app.route('/api/referral/init', methods=['GET', 'POST', 'OPTIONS'])
 def init_referral():
-    return _build_cors_response({"status": "ready", "version": "v33.2.9"})
+    return _build_cors_response({"status": "ready", "version": "v33.2.10"})
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
@@ -53,7 +53,7 @@ def chat():
             NEW_API_BASE,
             headers={"Authorization": f"Bearer {NEW_API_KEY}"},
             json={
-                "model": "deepseek-reasoner", # 改回这个已经定价的名字！
+                "model": "deepseek-reasoner", # 使用您测试通过的模型名
                 "messages": [system_prompt] + messages,
                 "temperature": 0.7
             },
