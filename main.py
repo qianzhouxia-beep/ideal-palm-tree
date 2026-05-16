@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-NEW_API_BASE = "http://43.156.119.47:3000/v1/chat/completions"
+NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
 NEW_API_KEY = "sk-Sef-9i7k]1zjicK6Nv" 
 
 @app.route('/')
