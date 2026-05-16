@@ -79,6 +79,13 @@ def chat():
     req_data = request.json
     messages = req_data.get('messages', [])
     lang = req_data.get('lang', 'zh')
+    user_email = req_data.get('email')
+    
+    # Verify Premium Status via Email
+    is_premium = False
+    pay_data = load_json(PAYMENTS_FILE)
+    if user_email and pay_data.get(user_email, {}).get('status') == 'paid':
+        is_premium = True
     
     # Logic: User (1-4) -> Oracle (1-4) -> User (5) -> Report (5)
     user_msg_count = len([m for m in messages if m['role'] == 'user'])
@@ -124,19 +131,16 @@ def chat():
             # Handle possible variations in header naming by the AI
             free = parts[0].replace('PART A:', '').replace('[Psychological Analysis]', '').replace('[心理学解析]', '').replace('**[Psychological Analysis]**', '').replace('**[心理学解析]**', '').strip()
             paid = parts[1].replace('PART B:', '').replace("[The Oracle's Prophecy]", '').replace('[神谕命运路径]', '').replace("**[The Oracle's Prophecy]**", '').replace('**[神谕命运路径]**', '').strip() if len(parts) > 1 else "The destiny is veiled..."
+            
+            # If not premium, the frontend handles blur, but we send status for clarity
             return _cors(jsonify({
                 "mode": "report", 
+                "status": "full" if is_premium else "partial",
                 "content": "The veil is lifted.", 
                 "data": {"free_part": free, "paid_part": paid}
             }))
     except Exception as e:
         return _cors(jsonify({"error": str(e)}), 500)
-
-def _cors(res):
-    res.headers["Access-Control-Allow-Origin"] = "*"
-    res.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
-    res.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    return res
 
 @app.route('/api/verify-license', methods=['POST', 'OPTIONS'])
 def verify_license():
@@ -183,60 +187,6 @@ def verify_license():
                 "message": res_data.get('message', 'Invalid license key')
             })), 400
             
-    except Exception as e:
-        return _cors(jsonify({"error": str(e)}), 500)
-
-@app.route('/api/dream', methods=['POST', 'OPTIONS'])
-def dream():
-    if request.method == 'OPTIONS': return _cors(make_response())
-    try:
-        data = request.json
-        # 兼容处理 lang 参数
-        lang = data.get('lang', 'en')
-        messages = data.get('messages', [])
-        is_premium = data.get('is_premium', False)
-        
-        # 验证 Premium 状态 (通过邮箱检查)
-        user_email = data.get('email')
-        pay_data = load_json(PAYMENTS_FILE)
-        if user_email and pay_data.get(user_email, {}).get('status') == 'paid':
-            is_premium = True
-
-        # 构建 Prompt
-        system_prompt = get_system_prompt(lang)
-        full_messages = [{"role": "system", "content": system_prompt}] + messages
-
-        # 调用后端接口 (DeepSeek-R1)
-        response = requests.post(
-            API_URL,
-            headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-            json={
-                "model": "deepseek-reasoner",
-                "messages": full_messages,
-                "temperature": 0.7
-            },
-            timeout=120
-        )
-        
-        ai_res = response.json()
-        content = ai_res['choices'][0]['message']['content']
-
-        # 逻辑：非 Premium 用户截断内容
-        if not is_premium and "---PROPHECY_START---" in content:
-            parts = content.split("---PROPHECY_START---")
-            free = parts[0]
-            paid = parts[1] if len(parts) > 1 else ""
-            return _cors(jsonify({
-                "status": "partial", 
-                "data": {"free_part": free, "paid_part": paid}
-            }))
-        else:
-            free = content.replace("---PROPHECY_START---", "")
-            paid = ""
-            return _cors(jsonify({
-                "status": "full", 
-                "data": {"free_part": free, "paid_part": paid}
-            }))
     except Exception as e:
         return _cors(jsonify({"error": str(e)}), 500)
 
