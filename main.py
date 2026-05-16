@@ -1,77 +1,65 @@
-# main.py - Version: v33.2.2 Stable (REED MASTER EDITION)
+# main.py - Version: v33.2.5 (THE UNSTOPPABLE VERSION)
 import os
-import json
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 
 app = Flask(__name__)
-# 彻底放开跨域，确保本地测试 100% 成功
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+# 禁用严格斜杠检查，解决 405 和路径匹配问题
+app.url_map.strict_slashes = False
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
-# --- 核心配置：已指向您的 4GB Zeabur 主战场 ---
+# 配置主战场
 NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
-# 已更新为您的最新 dream_api 令牌
+# 请务必在此处填入您在主战场生成的完整 sk-xxxx 密钥
 NEW_API_KEY = "sk-Yb6fOVUVZHJpbMakOSdT8fPF4sUTTS1GwcJeNkGRczdm1EEK" 
-DATA_FILE = "/data/referrals.json"
+
+def _add_cors_headers(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response
 
 @app.route('/')
-def home():
-    return jsonify({
-        "status": "Subconscious Mirror Oracle is Live",
-        "infra": "Zeabur 4GB Cluster",
-        "project": "DreamProject",
-        "model": "DeepSeek-R1"
-    })
+def index():
+    return "<h1>Dream Mirror Backend is Running!</h1>"
 
-@app.route('/api/referral/init', methods=['GET', 'OPTIONS'])
+# 核心初始化接口：允许 GET 和 POST
+@app.route('/api/referral/init', methods=['GET', 'POST', 'OPTIONS'])
 def init_referral():
-    return jsonify({"status": "initialized", "message": "Oracle is ready"})
+    if request.method == 'OPTIONS':
+        return _add_cors_headers(make_response())
+    res = jsonify({"status": "ready", "msg": "Mirror connected successfully!"})
+    return _add_cors_headers(res)
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
     if request.method == 'OPTIONS':
-        return '', 200
+        return _add_cors_headers(make_response())
         
     data = request.json
     messages = data.get('messages', [])
     lang = data.get('lang', 'zh')
     
-    # 神秘学先知提示词（黄金标准）
-    system_prompt = {
-        "role": "system", 
-        "content": (
-            "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
-            "Rule 1: Deliver report in TWO PARTS (Part A: Deep Analysis, Part B: The Oracle's Prophecy). "
-            "Rule 2: At the end of every response, ask exactly ONE follow-up question. "
-            f"Rule 3: You MUST respond in {'CHINESE' if lang == 'zh' else 'ENGLISH'}."
-        )
-    }
-    
     try:
-        # 发送请求到您的主战场
         response = requests.post(
             NEW_API_BASE,
-            headers={"Authorization": f"Bearer {NEW_API_KEY}"},
-            json={
-                "model": "deepseek-chat", # 兼容性最好的模型名
-                "messages": [system_prompt] + messages, 
-                "temperature": 0.7
+            headers={
+                "Authorization": f"Bearer {NEW_API_KEY}",
+                "Content-Type": "application/json"
             },
-            timeout=60
+            json={
+                "model": "deepseek-r1", # 已经过主战场映射
+                "messages": [
+                    {"role": "system", "content": f"You are a Mysterious Dream Oracle. Output in {'Chinese' if lang=='zh' else 'English'}."}
+                ] + messages
+            },
+            timeout=120
         )
-        return jsonify(response.json())
+        return _add_cors_headers(jsonify(response.json()))
     except Exception as e:
-        # 统一错误响应，避免前端解析失败
-        return jsonify({"error": "Ether Connection Flicker", "details": str(e)}), 500
-
-@app.route('/api/referral', methods=['GET'])
-def check_referral():
-    inviter_id = request.args.get('id')
-    return jsonify({"status": "active", "inviter": inviter_id})
+        return _add_cors_headers(jsonify({"error": str(e)})), 500
 
 if __name__ == '__main__':
-    # 强制处理 Zeabur 端口解析
     port = int(os.environ.get("PORT", 5000))
-    print(f"Oracle Starting on Port {port}...")
     app.run(host='0.0.0.0', port=port)
