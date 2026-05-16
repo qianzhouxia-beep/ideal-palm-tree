@@ -1,68 +1,34 @@
-# main.py - Version: v33.2.10 (FINAL BATTLE-READY EDITION)
-import os
-import requests
-from flask import Flask, request, jsonify, make_response, send_file
-from flask_cors import CORS
-
-app = Flask(__name__)
-app.url_map.strict_slashes = False
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
-
-# --- 核心配置区：使用您刚刚测试成功的黄金钥匙 ---
-NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
-# 这里填入您刚刚生成的 Mirror API 完整密钥
-NEW_API_KEY = "sk-biaE1BokgWzky0VkQwX3DuiVCThyVjIlf9BxejJSGi3U0M8j" 
-HTML_FILE = "dream_pro_landing_v33_referral.html"
-
-def _build_cors_response(data, status=200):
-    response = make_response(jsonify(data), status)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
-
-@app.route('/')
-def serve_index():
-    if os.path.exists(HTML_FILE):
-        return send_file(HTML_FILE)
-    return "<h1>Error: HTML File Missing</h1>", 404
-
-@app.route('/api/referral/init', methods=['GET', 'POST', 'OPTIONS'])
-def init_referral():
-    return _build_cors_response({"status": "ready", "version": "v33.2.10"})
-
+# main.py - Version: v33.2.11 (SMART FORMATTER)
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
     if request.method == 'OPTIONS':
         return _build_cors_response({})
     
     data = request.json
-    messages = data.get('messages', [])
-    lang = data.get('lang', 'zh')
-    
-    system_prompt = {
-        "role": "system",
-        "content": (
-            "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
-            "Rule 1: Deliver report in TWO PARTS (Part A: Analysis, Part B: Prophecy). "
-            "Rule 2: Ask ONE follow-up question. "
-            f"Rule 3: You MUST respond in {'Chinese' if lang == 'zh' else 'English'}."
-        )
-    }
-    
     try:
         response = requests.post(
             NEW_API_BASE,
             headers={"Authorization": f"Bearer {NEW_API_KEY}"},
             json={
-                "model": "deepseek-reasoner", # 使用您测试通过的模型名
-                "messages": [system_prompt] + messages,
+                "model": "deepseek-reasoner",
+                "messages": data.get('messages', []),
                 "temperature": 0.7
             },
             timeout=120
         )
-        return _build_cors_response(response.json())
+        res_json = response.json()
+        
+        # --- 关键修正：确保网页能读到内容 ---
+        # 如果是 reasoner 模型，我们要把 content 提取出来
+        if "choices" in res_json:
+            content = res_json["choices"][0]["message"].get("content", "")
+            # 如果 content 为空，尝试取推理内容（虽然不建议，但作为兜底）
+            if not content:
+                content = res_json["choices"][0]["message"].get("reasoning_content", "Oracle is thinking deep...")
+            
+            # 重新封装成网页认识的格式
+            return _build_cors_response({"choices": [{"message": {"content": content}}]})
+            
+        return _build_cors_response(res_json)
     except Exception as e:
         return _build_cors_response({"error": str(e)}, 500)
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
