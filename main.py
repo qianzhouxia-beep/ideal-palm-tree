@@ -1,155 +1,553 @@
-# main.py - Version: v33.2.14 (MASTER FINAL)
-import os
-import json
-import requests
-import time
-from flask import Flask, request, jsonify, make_response, send_file
-from flask_cors import CORS
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO Meta Tags -->
+    <title>Subconscious Mirror | Premium AI Dream Oracle</title>
+    <meta name="description" content="Discover the hidden depths of your dreams with Subconscious Mirror. A premium AI Oracle combining psychological depth and Eastern wisdom.">
+    <meta name="keywords" content="AI Dream Interpretation, Dream Analysis, DeepSeek, Subconscious, Oracle, Eastern Wisdom">
+    <meta property="og:title" content="Subconscious Mirror | Premium AI Dream Oracle">
+    <meta property="og:description" content="A digital bridge to your subconscious. Experience the world's most profound AI dream analysis.">
+    <meta property="og:image" content="https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g/thumbnail.jpg">
 
-app = Flask(__name__)
-app.url_map.strict_slashes = False
-CORS(app, supports_credentials=True)
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://app.lemonsqueezy.com/js/lemon.js" defer></script>
 
-# --- CONFIGURATION ---
-NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
-NEW_API_KEY = "sk-biaE1BokgWzky0VkQwX3DuiVCThyVjIlf9BxejJSGi3U0M8j"
-HTML_FILE = "dream_pro_landing_v33_referral.html"
-DATA_FILE = "referrals.json"
-PAYMENTS_FILE = "payments.json"
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { body: ['Inter', 'sans-serif'], display: ['Instrument Serif', 'serif'] },
+                    colors: { bg: '#0a0a0a', surface: '#141414', accent: '#89AACC' }
+                }
+            }
+        }
+    </script>
 
-# Init data
-for f_path in [DATA_FILE, PAYMENTS_FILE]:
-    if not os.path.exists(f_path):
-        with open(f_path, "w") as f: json.dump({}, f)
+    <style>
+        html { scroll-behavior: smooth; }
+        body { background-color: #0a0a0a; color: #f5f5f5; overflow-x: hidden; }
+        .accent-gradient { background: linear-gradient(90deg, #89AACC 0%, #4E85BF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .video-overlay { background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(10,10,10,0.85) 100%); }
+        .nav-pill { backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .plan-btn { width: 100%; padding: 1rem 0; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 9999px; text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.4s ease; color: white; background: transparent; cursor: pointer; }
+        .plan-btn:hover { background: white; color: black; font-weight: bold; box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1); }
+        .mystic-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; color: white; transition: all 0.4s ease; }
+        .mystic-input:focus { border-color: #89AACC; outline: none; background: rgba(255, 255, 255, 0.06); box-shadow: 0 0 20px rgba(137, 170, 204, 0.1); }
+        .chat-bubble { max-width: 85%; padding: 16px 20px; border-radius: 24px; font-size: 1.1rem; line-height: 1.5; margin-bottom: 20px; transform: translateY(10px); opacity: 0; }
+        .ai-bubble { background: rgba(137, 170, 204, 0.1); color: #ddd; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .user-bubble { background: #fff; color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
+        .typing-dot { width: 6px; height: 6px; background: #89AACC; border-radius: 50%; opacity: 0.3; animation: blink 1.4s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+        .blurred { filter: blur(18px); opacity: 0.2; pointer-events: none; transition: all 1.5s ease-in-out; }
+        .unblurred { filter: blur(0); opacity: 1; pointer-events: auto; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); }
+        .modal-content { max-width: 600px; width: 90%; background: #141414; border: 1px solid rgba(255,255,255,0.1); border-radius: 32px; padding: 48px; position: relative; }
+        #modal-text { max-height: 60vh; overflow-y: auto; padding-right: 12px; }
+        #status-card { position: absolute; top: 100%; margin-top: 12px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; min-width: 240px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 50; }
+    </style>
+</head>
+<body class="font-body">
 
-def load_json(path):
-    with open(path, "r") as f: return json.load(f)
+    <!-- Loading Screen -->
+    <div id="loader" class="fixed inset-0 bg-bg z-[100] p-10 flex flex-col justify-between">
+        <div class="text-[10px] text-gray-500 uppercase tracking-[0.4em]">Subconscious Mirror / '26 <span class="text-accent ml-2">v33.2 Stable</span></div>
+        <div class="flex-1 flex items-center justify-center text-5xl font-display italic" id="t-loader-word">Dream</div>
+        <div class="flex justify-between items-end">
+            <div id="loader-count" class="text-9xl font-display">000</div>
+            <div class="w-full max-w-xs h-px bg-white/10 relative"><div id="loader-bar" class="absolute inset-0 bg-white origin-left scale-x-0"></div></div>
+        </div>
+    </div>
 
-def save_json(path, data):
-    with open(path, "w") as f: json.dump(data, f)
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 flex justify-center pt-8 px-4 opacity-0" id="navbar">
+        <div class="relative flex flex-col items-center">
+            <div class="nav-pill bg-white/5 rounded-full px-2 py-2 flex items-center gap-2 hover:bg-white/10 transition-all">
+                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-black font-display italic text-sm" onclick="toggleStatusCard()">SM</div>
+                <div class="hidden md:flex gap-6 text-[10px] uppercase tracking-[0.2em] px-4 text-gray-400 border-r border-white/10">
+                    <a href="#hero" id="t-nav-home" class="hover:text-white transition-colors">Home</a>
+                    <a href="#interpret" id="t-nav-oracle" class="hover:text-white transition-colors">Oracle</a>
+                    <a href="#pricing" id="t-nav-pricing" class="hover:text-white transition-colors">Pricing</a>
+                </div>
+                <div class="flex items-center gap-2 px-3" onclick="toggleStatusCard()">
+                    <div id="status-light" class="w-2.5 h-2.5 rounded-full bg-accent animate-pulse"></div>
+                    <span class="text-[9px] text-accent uppercase tracking-widest font-bold" id="t-nav-balance">Ready</span>
+                </div>
+                <button onclick="toggleLang()" id="lang-btn" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white px-3 border-l border-white/10">ZH</button>
+                <a href="mailto:hi@api-tokenmaster.com" target="_blank" id="t-nav-hi" class="bg-white/10 px-6 py-3 rounded-full text-[11px] uppercase tracking-widest text-white font-bold hover:bg-white/20 transition-all">Say Hi ↗</a>
+            </div>
+            
+            <div id="status-card" class="absolute top-full mt-4 bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 min-w-[240px] shadow-2xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300">
+                <h5 class="text-[10px] text-gray-500 uppercase tracking-widest mb-4" id="t-sc-title">Oracle Engine</h5>
+                <div class="text-xl font-display italic mb-1 text-white">DeepSeek-R1 (Reasoner)</div>
+                <p class="text-[9px] text-accent uppercase tracking-widest mb-6" id="t-sc-sync">Quantum Logic Sync: Active</p>
+                <div class="pt-4 border-t border-white/5">
+                    <button onclick="gsap.to(window, {scrollTo: '#pricing', duration:1})" class="text-[9px] text-accent uppercase tracking-widest hover:text-white transition-all" id="t-sc-recharge">Recharge Energy ↗</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-def _cors(res):
-    res.headers["Access-Control-Allow-Origin"] = "*"
-    res.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    res.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    return res
+    <!-- Hero Section -->
+    <section id="hero" class="relative h-screen w-full flex items-center justify-center">
+        <video id="hero-video" class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline></video>
+        <div class="absolute inset-0 video-overlay z-10"></div>
+        <div class="relative z-20 text-center px-6 pt-24 max-w-6xl">
+            <span class="text-[10px] text-gray-500 uppercase tracking-[0.5em] mb-12 block" id="t-hero-eyebrow">Revealing the Unseen</span>
+            <h1 id="t-hero-title" class="text-7xl md:text-[9.5rem] font-display italic leading-[0.8] tracking-tighter text-white mb-10 opacity-0">
+                Subconscious <br> <span class="accent-gradient pr-4">Mirror</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-400 font-light max-w-xl mx-auto mb-16" id="t-hero-desc">
+                A <span class="text-white font-display italic">Dream Oracle</span> providing ancient wisdom in a modern digital age.
+            </p>
+            <button onclick="gsap.to(window, {duration: 1.5, scrollTo: '#interpret', ease: 'power4.inOut'})" 
+                    class="px-12 py-5 bg-white text-black rounded-full font-bold text-[11px] md:text-xs uppercase tracking-widest hover:scale-105 transition-all" id="t-hero-start">
+                Start Interpretation
+            </button>
+        </div>
+    </section>
 
-# --- ROUTES ---
+    <!-- Interpretation Section -->
+    <section id="interpret" class="min-h-screen bg-bg py-32 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-6xl font-display italic text-white mb-6" id="t-interpret-whisper">Whisper your dream</h2>
+                <div class="flex flex-col gap-2">
+                    <p class="text-gray-500 text-[9px] uppercase tracking-widest" id="t-interpret-akashic">Connect to the Akashic records below</p>
+                    <div id="turn-indicator" class="text-[9px] text-accent font-bold uppercase tracking-widest opacity-0">Connection 0 / 5</div>
+                </div>
+            </div>
+            <div class="glass-card p-8 md:p-12 flex flex-col min-h-[600px]">
+                <div id="chat-window" class="flex-1 flex flex-col mb-8 overflow-y-auto pr-2 custom-scrollbar">
+                    <div class="ai-bubble chat-bubble" style="opacity:1; transform:none;" id="t-chat-welcome">I am listening. Share your dream with me...</div>
+                </div>
 
-@app.route('/')
-def index():
-    if os.path.exists(HTML_FILE):
-        return send_file(HTML_FILE)
-    return "<h1>Mirror Sanctum Error: HTML File Missing</h1>", 404
+                <div id="chat-input-area" class="space-y-4">
+                    <textarea id="t-chat-placeholder" rows="3" class="mystic-input w-full p-6 text-lg text-white font-light placeholder-gray-500" placeholder="Type here..."></textarea>
+                    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                        <input type="text" id="t-chat-dob" class="mystic-input w-full md:w-64 p-4 text-sm text-white placeholder-gray-500" placeholder="DOB (YYYY-MM-DD)">
+                        <div class="flex gap-4 w-full md:w-auto">
+                            <button onclick="resetOracle()" id="t-oracle-reset" class="flex-1 md:flex-none px-8 py-4 bg-white/5 border border-white/10 text-gray-400 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Reset</button>
+                            <button onclick="sendMessage()" id="t-chat-send" class="flex-[2] md:flex-none px-12 py-4 bg-white text-black rounded-full font-bold text-[11px] md:text-xs uppercase tracking-widest hover:scale-105 transition-all">Send Message</button>
+                        </div>
+                    </div>
+                </div>
 
-@app.route('/api/referral/init', methods=['POST', 'OPTIONS'])
-def init_ref():
-    if request.method == 'OPTIONS': return _cors(make_response())
-    # Generate a simple unique ID for referral
-    ref_id = f"ref_{int(time.time())}_{os.urandom(2).hex()}"
-    data = load_json(DATA_FILE)
-    data[ref_id] = {"count": 0, "ips": []}
-    save_json(DATA_FILE, data)
-    return _cors(jsonify({"status": "ready", "refId": ref_id}))
+                <div id="final-report" class="hidden space-y-12 py-10">
+                    <div class="text-center pt-8 pb-4">
+                        <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center text-black font-display italic text-3xl mx-auto mb-6 shadow-2xl">SM</div>
+                        <h2 class="text-4xl md:text-6xl font-display italic text-white" id="t-destiny-report">Destiny Report</h2>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="text-[10px] text-gray-500 uppercase tracking-widest flex items-center gap-2" id="t-res-psych">
+                            <span class="text-accent text-lg">🧠</span> Psychology Analysis
+                        </h4>
+                        <p id="res-free" class="text-xl text-gray-300 font-light leading-relaxed"></p>
+                    </div>
+                    <div class="w-full aspect-video bg-white/5 rounded-3xl flex items-center justify-center border border-white/10 group cursor-pointer overflow-hidden relative">
+                        <div id="image-placeholder" class="text-center">
+                            <div class="text-accent text-3xl mb-2">🎨</div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest" id="t-gen-img">Generate Dream Image</div>
+                        </div>
+                    </div>
+                    <div class="relative pt-8 border-t border-white/10">
+                        <h4 class="text-[10px] text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2" id="t-res-destiny">
+                            <span class="text-accent text-lg">🔮</span> Eastern Destiny Path
+                        </h4>
+                        <div id="res-paid-blur" class="blurred"><p id="res-paid" class="text-xl text-gray-300 font-light leading-relaxed"></p></div>
+                        <div id="pay-overlay" class="absolute inset-0 flex items-center justify-center pt-10">
+                            <div class="text-center p-10 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[32px] max-w-sm mx-auto shadow-2xl">
+                                <p class="text-xs text-gray-400 uppercase tracking-[0.2em] mb-6" id="t-unlock-msg">Unlock your full destiny path</p>
+                                <div class="flex flex-col gap-4">
+                                    <button onclick="openPayOverlay('https://tokenmasterglobal.lemonsqueezy.com/checkout/buy/39dc3938-07a6-4a2e-a89f-fd217b3d31f3')" 
+                                       class="inline-block w-full px-10 py-5 bg-accent text-bg rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-accent/20" id="t-unlock-btn">
+                                        Unlock Full Report ($4.99)
+                                    </button>
+                                    <button onclick="openReferralModal()" class="text-[9px] text-white/40 hover:text-white uppercase tracking-widest transition-all" id="t-ref-btn">Invite 2 friends to unlock for free</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center pt-8">
+                        <button onclick="resetOracle()" class="text-[9px] text-gray-500 uppercase tracking-[0.4em] hover:text-white transition-all underline underline-offset-8" id="t-oracle-new">Begin New Journey</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-@app.route('/api/referral/status', methods=['GET'])
-def referral_status():
-    ref_id = request.args.get('refId')
-    data = load_json(DATA_FILE)
-    if ref_id in data:
-        return _cors(jsonify({"count": data[ref_id]["count"]}))
-    return _cors(jsonify({"count": 0}))
+    <!-- Pricing Section -->
+    <section id="pricing" class="relative py-32 px-6 border-t border-white/5 bg-bg">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-4xl md:text-7xl font-display italic text-white mb-6" id="t-pricing-title">Invest in your <span class="accent-gradient">self</span></h2>
+            <p class="text-gray-500 text-xs uppercase tracking-widest mb-24" id="t-pricing-sub">Choose your path to enlightenment</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-12 flex flex-col items-center">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-6" id="t-tier1-name">The Spark</span>
+                    <div class="text-5xl font-display italic mb-8">$4.99</div>
+                    <ul class="text-gray-400 text-sm space-y-4 mb-12">
+                        <li id="t-tier1-f1">1 Deep Interpretation</li>
+                        <li id="t-tier1-f2">Eastern Wisdom Alignment</li>
+                        <li id="t-tier1-f3" class="text-accent text-[9px] uppercase tracking-widest font-bold">Powered by DeepSeek-R1</li>
+                    </ul>
+                    <button onclick="selectPlan(0, 'https://tokenmasterglobal.lemonsqueezy.com/checkout/buy/39dc3938-07a6-4a2e-a89f-fd217b3d31f3')" class="plan-btn" id="t-select-0">Select Plan</button>
+                </div>
+                <div class="glass-card p-12 flex flex-col items-center relative card-active">
+                    <div class="absolute -top-4 bg-accent text-bg text-[10px] font-bold px-6 py-2 rounded-full uppercase tracking-widest" id="t-pricing-pop">Most Popular</div>
+                    <span class="text-[10px] text-gray-400 uppercase tracking-widest mb-6" id="t-tier2-name">The Seeker</span>
+                    <div class="text-5xl font-display italic mb-8">$12.99</div>
+                    <ul class="text-gray-400 text-sm space-y-4 mb-12">
+                        <li id="t-tier2-f1">5 Deep Interpretations</li>
+                        <li id="t-tier2-f2">Personalized Destiny Map</li>
+                        <li id="t-tier2-f3" class="text-accent text-[9px] uppercase tracking-widest font-bold">Powered by DeepSeek-R1</li>
+                    </ul>
+                    <button onclick="selectPlan(1, 'https://tokenmasterglobal.lemonsqueezy.com/checkout/buy/c85966e2-beec-4c3f-870e-98c567ca8bd5')" class="plan-btn" id="t-select-1">Select Plan</button>
+                </div>
+                <div class="glass-card p-12 flex flex-col items-center">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-6" id="t-tier3-name">The Oracle</span>
+                    <div class="text-5xl font-display italic mb-8">$29.99</div>
+                    <ul class="text-gray-400 text-sm space-y-4 mb-12">
+                        <li id="t-tier3-f1">Unlimited Monthly Access</li>
+                        <li id="t-tier3-f2">DeepSeek R1 High-Priority</li>
+                        <li id="t-tier3-f3" class="text-accent text-[9px] uppercase tracking-widest font-bold">Nous Hermes 3 Integration</li>
+                    </ul>
+                    <button onclick="selectPlan(2, 'https://tokenmasterglobal.lemonsqueezy.com/checkout/buy/ba48443e-43c1-4646-9046-1d0e94b92cfb')" class="plan-btn" id="t-select-2">Select Plan</button>
+                </div>
+            </div>
+        </div>
+    </section>
 
-@app.route('/api/referral/click', methods=['POST'])
-def referral_click():
-    inviter_id = request.json.get('refBy')
-    visitor_ip = request.remote_addr
-    data = load_json(DATA_FILE)
-    if inviter_id and inviter_id in data:
-        if visitor_ip not in data[inviter_id]["ips"]:
-            data[inviter_id]["ips"].append(visitor_ip)
-            data[inviter_id]["count"] += 1
-            save_json(DATA_FILE, data)
-            return _cors(jsonify({"status": "counted", "count": data[inviter_id]["count"]}))
-    return _cors(jsonify({"status": "ignored"}))
+    <!-- Referral Modal -->
+    <div id="referral-modal" class="modal" onclick="if(event.target === this) closeReferralModal()">
+        <div class="modal-content custom-scrollbar text-center">
+            <button onclick="closeReferralModal()" class="absolute top-8 right-8 text-gray-400 hover:text-white text-2xl">✕</button>
+            <h3 class="font-display italic text-4xl text-white mb-6" id="t-ref-modal-title">Pass the Spark</h3>
+            <p class="text-gray-400 text-sm mb-10 leading-relaxed" id="t-ref-modal-desc">Share this magical mirror with 2 friends. When they begin their journey, your full destiny path will be revealed for free.</p>
+            
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-8 flex items-center justify-between">
+                <code id="ref-link" class="text-xs text-accent truncate mr-4">Loading...</code>
+                <button onclick="copyRefLink()" class="px-4 py-2 bg-white/10 rounded-lg text-[10px] uppercase tracking-widest hover:bg-white/20 transition-all" id="t-copy-btn">Copy</button>
+            </div>
 
-@app.route('/api/chat', methods=['POST', 'OPTIONS'])
-def chat():
-    if request.method == 'OPTIONS': return _cors(make_response())
-    req_data = request.json
-    messages = req_data.get('messages', [])
-    lang = req_data.get('lang', 'zh')
-    
-    # Logic: User (1-4) -> Oracle (1-4) -> User (5) -> Report (5)
-    user_msg_count = len([m for m in messages if m['role'] == 'user'])
-    mode = 'question' if user_msg_count < 5 else 'report'
+            <div class="flex flex-col items-center">
+                <div id="t-ref-status-text" class="text-[10px] text-gray-500 uppercase tracking-widest mb-4">Journeyers joined: 0 / 2</div>
+                <div class="w-full max-w-xs h-1 bg-white/10 rounded-full overflow-hidden">
+                    <div id="ref-progress" class="h-full bg-accent transition-all duration-1000" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    warning_msg = "再这样我就生气了😡！" if lang == 'zh' else "Don't make me angry! 😡"
-    system_content = (
-        "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
-        "Maintain a vibe of ancient mystery but be 'smart' and witty. "
-        "If the user provides very short, lazy, or nonsensical input (like just a single number, letter, or emoji), "
-        "do not be overly solemn. Respond with wit, gentle irony, or humor while staying in character as a cryptic sage. "
-        "Acknowledge their 'minimalist' approach (e.g., 'A dream as brief as a single breath...', 'You are being stingy with your subconscious treasures...') "
-        "before asking a provocative follow-up. "
-        f"If they are being persistent with nonsense or laziness, you can end with a humorous warning like '{warning_msg}'. "
-        f"IMPORTANT: You MUST respond in {'CHINESE' if lang == 'zh' else 'ENGLISH'}. "
-    )
-    if mode == 'question':
-        system_content += "Rule: Ask exactly ONE short, provocative follow-up question to dig deeper."
-    else:
-        part_a = "心理学解析" if lang == 'zh' else "Psychological Analysis"
-        part_b = "神谕命运路径" if lang == 'zh' else "The Oracle's Prophecy"
-        system_content += (
-            f"Rule: Deliver a final report in TWO PARTS. "
-            f"PART A: [{part_a}]. PART B: [{part_b}]. "
-            "Separate them with the string '---PROPHECY_START---'."
-        )
+    <!-- Terms Modal -->
+    <div id="terms-modal" class="modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content custom-scrollbar">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-gray-400 hover:text-white text-2xl">✕</button>
+            <div class="flex flex-col h-full">
+                <h3 class="font-display italic text-4xl text-white mb-10" id="t-modal-title">USAGE TERMS</h3>
+                <div id="modal-text" class="custom-scrollbar text-gray-400 text-sm leading-relaxed space-y-6"></div>
+            </div>
+        </div>
+    </div>
 
-    try:
-        response = requests.post(
-            NEW_API_BASE,
-            headers={"Authorization": f"Bearer {NEW_API_KEY}", "Content-Type": "application/json"},
-            json={"model": "deepseek-reasoner", "messages": [{"role": "system", "content": system_content}] + messages, "temperature": 0.8},
-            timeout=120
-        )
-        res_json = response.json()
-        ai_msg = res_json['choices'][0]['message']
-        text = ai_msg.get('content') or ai_msg.get('reasoning_content') or ""
+    <footer class="py-24 text-center bg-bg border-t border-white/5">
+        <div class="flex justify-center gap-12 mb-16 text-[11px] uppercase tracking-[0.4em] text-gray-400 font-bold">
+            <button onclick="openModal('terms')" id="t-footer-terms">USAGE TERMS</button>
+            <button onclick="openModal('privacy')" id="t-footer-privacy">PRIVACY POLICY</button>
+        </div>
+        <div class="text-7xl md:text-[10rem] font-display italic text-white/[0.03] mb-12">Subconscious Mirror</div>
+        <p class="text-gray-700 text-[10px] uppercase tracking-[0.5em]" id="t-footer-copy">&copy; 2026 TokenMaster Global. All rights reserved. <span class="ml-4 opacity-30 text-[8px]">v33.2 Stable</span></p>
+    </footer>
+
+    <script>
+        let currentLang = 'en';
+        const API_BASE = window.location.origin;
+        let refId = localStorage.getItem('sm_ref_id') || null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const refBy = urlParams.get('ref');
+
+        const i18n = {
+            en: { 
+                nav_home: "Home", nav_oracle: "Oracle", nav_pricing: "Pricing", nav_hi: "Say Hi ↗", nav_balance: "Ready",
+                hero_eyebrow: "Revealing the Unseen", hero_title: "Subconscious <br> <span class='accent-gradient pr-4'>Mirror</span>", hero_desc: "A <span class='text-white font-display italic'>Dream Oracle</span> providing ancient wisdom in a modern digital age.", hero_start: "Start Interpretation",
+                interpret_whisper: "Whisper your dream", interpret_akashic: "Connect to the Akashic records below",
+                chat_welcome: "I am listening. Share your dream with me...", chat_placeholder: "Type here...", chat_dob: "DOB (YYYY-MM-DD)", chat_send: "Send Message",
+                oracle_reset: "Reset", oracle_new: "Return",
+                report_gen: "The oracle is crafting your destiny report...",
+                pricing_title: "Invest in your <span class='accent-gradient'>self</span>", pricing_sub: "Choose your path to enlightenment", pricing_pop: "Most Popular",
+                tier1_name: "The Spark", tier2_name: "The Seeker", tier3_name: "The Oracle",
+                tier1_f1: "1 Deep Interpretation", tier1_f2: "Eastern Wisdom Alignment", tier1_f3: "Powered by DeepSeek-R1",
+                tier2_f1: "5 Deep Interpretations", tier2_f2: "Personalized Destiny Map", tier2_f3: "Powered by DeepSeek-R1",
+                tier3_f1: "Unlimited Monthly Access", tier3_f2: "DeepSeek R1 High-Priority", tier3_f3: "Nous Hermes 3 Integration",
+                select_0: "Select Plan", select_1: "Select Plan", select_2: "Select Plan",
+                unlock_msg: "Unlock your full destiny path", unlock_btn: "Unlock Full Report ($4.99)",
+                ref_btn: "Invite 2 friends to unlock for free", ref_modal_title: "Pass the Spark", ref_modal_desc: "Share this magical mirror with 2 friends. When they begin their journey, your full destiny path will be revealed for free.",
+                copy_btn: "Copy", copied: "Copied!", sc_title: "Oracle Engine", sc_sync: "Quantum Logic Sync: Active", sc_recharge: "Recharge Energy ↗", turn_label: "Connection", slow_thought: "The oracle is traversing the dream realm...", error_ether: "The connection to the ether has flickered.",
+                ref_status_text: "Journeyers joined: ", footer_terms: "USAGE TERMS", footer_privacy: "PRIVACY POLICY", footer_copy: "&copy; 2026 TokenMaster Global. All rights reserved. <a href='https://api-tokenmaster.com' target='_blank' class='ml-4 hover:text-white transition-all underline underline-offset-4'>Powered by TokenMaster</a>",
+                res_psych: "<span class='text-accent text-lg'>🧠</span> Psychology Analysis",
+                destiny_report: "Destiny Report",
+                gen_img: "Generate Dream Image",
+                res_destiny: "<span class='text-accent text-lg'>🔮</span> Eastern Destiny Path",
+                modal_terms: `
+                    <div class="space-y-6 text-left">
+                        <p><strong>1. Spiritual Nature:</strong> All interpretations are provided for self-discovery and entertainment purposes only. Subconscious Mirror does not provide professional medical, psychological, or legal advice.</p>
+                        <p><strong>2. Energy Binding:</strong> Once purchased, Energy is tied to your browser's unique fingerprint. We do not use accounts to protect your absolute anonymity.</p>
+                        <p><strong>3. Non-Refundable:</strong> Due to the immediate allocation of AI reasoning resources (DeepSeek R1), all spiritual transactions are final once generation begins.</p>
+                    </div>
+                `,
+                modal_privacy: `
+                    <div class="space-y-6 text-left">
+                        <p><strong>1. Sacred Privacy:</strong> We do not store your dreams. Every session is a transient echo in the digital void, wiped immediately after the session ends.</p>
+                        <p><strong>2. Payment Integrity:</strong> All transactions are handled securely via LemonSqueezy. We never store or even see your financial details.</p>
+                        <p><strong>3. Zero Tracking:</strong> We do not use marketing trackers or sell user data to third parties. Your subconscious journey is yours alone.</p>
+                    </div>
+                `
+            },
+            zh: { 
+                nav_home: "首页", nav_oracle: "解梦神谕", nav_pricing: "价格方案", nav_hi: "打个招呼 ↗", nav_balance: "已就绪",
+                hero_eyebrow: "揭示未见之象", hero_title: "潜意识之<span class='accent-gradient pr-4'>镜</span>", hero_desc: "在数字时代提供古老智慧的<span class='text-white font-display italic'>解梦神谕</span>。", hero_start: "开始解梦",
+                interpret_whisper: "低语你的梦境", interpret_akashic: "连接下方的阿卡西记录",
+                chat_welcome: "我在倾听。分享你的梦境...", chat_placeholder: "在此输入...", chat_dob: "出生日期 (YYYY-MM-DD)", chat_send: "发送信息",
+                oracle_reset: "重置", oracle_new: "返回",
+                report_gen: "神谕正在编织您的命运报告...",
+                pricing_title: "投资你的<span class='accent-gradient'>内心</span>", pricing_sub: "选择您的觉醒之路", pricing_pop: "最受欢迎",
+                tier1_name: "灵感之火", tier2_name: "追寻之者", tier3_name: "觉醒神谕",
+                tier1_f1: "1次深度解析", tier1_f2: "东方智慧对齐", tier1_f3: "DeepSeek-R1 强力驱动",
+                tier2_f1: "5次深度解析", tier2_f2: "个人命运蓝图", tier2_f3: "DeepSeek-R1 强力驱动",
+                tier3_f1: "本月无限次访问", tier3_f2: "DeepSeek R1高优先级", tier3_f3: "Nous Hermes 3 深度集成",
+                select_0: "选择方案", select_1: "选择方案", select_2: "选择方案",
+                unlock_msg: "开启您的完整命运路径", unlock_btn: "解锁完整报告 ($4.99)",
+                ref_btn: "邀请2位好友免费解锁", ref_modal_title: "传递灵光", ref_modal_desc: "与2位好友分享这面魔镜。当他们开启旅程时，您的完整命运路径将免费点亮。",
+                copy_btn: "复制", copied: "已复制", sc_title: "神谕引擎", sc_sync: "量子逻辑同步：活跃", sc_recharge: "补充能量 ↗", turn_label: "连接进度", slow_thought: "神谕正在穿越梦境领域...", error_ether: "以太连接出现波动。",
+                ref_status_text: "已加入的旅人: ", footer_terms: "使用条款", footer_privacy: "隐私政策", footer_copy: "&copy; 2026 TokenMaster Global. 版权所有。<a href='https://api-tokenmaster.com' target='_blank' class='ml-4 hover:text-white transition-all underline underline-offset-4'>由 TokenMaster 提供技术支持</a>",
+                res_psych: "<span class='text-accent text-lg'>🧠</span> 心理学解析",
+                destiny_report: "解梦报告",
+                gen_img: "生成梦境画像",
+                res_destiny: "<span class='text-accent text-lg'>🔮</span> 东方命理路径",
+                modal_terms: `
+                    <div class="space-y-6 text-left">
+                        <p><strong>1. 精神探索声明：</strong>所有梦境解析仅供自我探索与娱乐之用。潜意识之镜不提供任何专业的医疗、心理学或法律建议。</p>
+                        <p><strong>2. 能量绑定逻辑：</strong>为了保护您的绝对匿名性，购买的能量将与您浏览器的唯一指纹绑定。请勿轻易清理浏览器缓存。</p>
+                        <p><strong>3. 不退款政策：</strong>鉴于 AI 推理资源（DeepSeek R1）的即时性分配，一旦解析任务开始，所有交易均不支持退款。</p>
+                    </div>
+                `,
+                modal_privacy: `
+                    <div class="space-y-6 text-left">
+                        <p><strong>1. 数据契约：</strong>我们不存储您的梦境内容。每一次对话都是数字虚空中的瞬时回响，解析完成后数据将被立即抹除。</p>
+                        <p><strong>2. 支付安全：</strong>所有交易均由 LemonSqueezy 安全处理。我们绝不会存储您的财务详细信息。</p>
+                        <p><strong>3. 零追踪承诺：</strong>我们不使用营销追踪器，也不向第三方出售用户数据。您的潜意识旅程仅属于您自己。</p>
+                    </div>
+                `
+            }
+        };
+
+        async function initReferral() {
+            if (!refId) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/referral/init`, { method: 'POST' });
+                    const data = await res.json();
+                    refId = data.refId;
+                    localStorage.setItem('sm_ref_id', refId);
+                } catch (e) { console.error("Ref init failed"); }
+            }
+            if (refId) document.getElementById('ref-link').innerText = `${window.location.origin}${window.location.pathname}?ref=${refId}`;
+            
+            // Handle clicking a referral link
+            if (refBy && refBy !== refId) {
+                try {
+                    await fetch(`${API_BASE}/api/referral/click`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refBy: refBy })
+                    });
+                } catch (e) { console.error("Ref click failed"); }
+            }
+        }
+
+        function renderLanguage() {
+            const t = i18n[currentLang];
+            document.querySelectorAll('[id^="t-"]').forEach(el => {
+                const key = el.id.replace('t-', '').replace(/-/g, '_');
+                if (t[key]) {
+                    if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') el.placeholder = t[key];
+                    else el.innerHTML = t[key];
+                }
+            });
+            document.getElementById('lang-btn').innerText = currentLang === 'en' ? 'ZH' : 'EN';
+            updateTurnIndicator();
+        }
+
+        function toggleLang() { currentLang = currentLang === 'en' ? 'zh' : 'en'; renderLanguage(); }
         
-        if mode == 'question':
-            return _cors(jsonify({"mode": "question", "content": text}))
-        else:
-            parts = text.split('---PROPHECY_START---')
-            # Handle possible variations in header naming by the AI
-            free = parts[0].replace('PART A:', '').replace('[Psychological Analysis]', '').replace('[心理学解析]', '').replace('**[Psychological Analysis]**', '').replace('**[心理学解析]**', '').strip()
-            paid = parts[1].replace('PART B:', '').replace("[The Oracle's Prophecy]", '').replace('[神谕命运路径]', '').replace("**[The Oracle's Prophecy]**", '').replace('**[神谕命运路径]**', '').strip() if len(parts) > 1 else "The destiny is veiled..."
-            return _cors(jsonify({
-                "mode": "report", 
-                "content": "The veil is lifted.", 
-                "data": {"free_part": free, "paid_part": paid}
-            }))
-    except Exception as e:
-        return _cors(jsonify({"error": str(e)}), 500)
+        function openModal(type) { 
+            const t = i18n[currentLang];
+            document.getElementById('modal-text').innerHTML = type === 'terms' ? t.modal_terms : t.modal_privacy;
+            document.getElementById('t-modal-title').innerText = type === 'terms' ? t.footer_terms : t.footer_privacy;
+            document.getElementById('terms-modal').style.display = 'flex'; 
+        }
+        function closeModal() { document.getElementById('terms-modal').style.display = 'none'; }
+        
+        function toggleStatusCard() {
+            const card = document.getElementById('status-card');
+            card.classList.toggle('opacity-0');
+            card.classList.toggle('opacity-100');
+            card.classList.toggle('translate-y-2');
+            card.classList.toggle('translate-y-0');
+            card.classList.toggle('pointer-events-none');
+            card.classList.toggle('pointer-events-auto');
+        }
+        
+        function openPayOverlay(url) { window.LemonSqueezy ? LemonSqueezy.Url.Open(url) : window.open(url, '_blank'); }
+        function selectPlan(i, url) { openPayOverlay(url); }
 
-@app.route('/api/gumroad/webhook', methods=['POST'])
-def gumroad_webhook():
-    gumroad_data = request.form
-    email = gumroad_data.get('email')
-    if email:
-        pay_data = load_json(PAYMENTS_FILE)
-        pay_data[email] = {"status": "paid", "timestamp": time.time()}
-        save_json(PAYMENTS_FILE, pay_data)
-        return "Success", 200
-    return "No Email Found", 400
+        function openReferralModal() {
+            document.getElementById('referral-modal').style.display = 'flex';
+            checkReferralStatus();
+            window.refInterval = setInterval(checkReferralStatus, 5000);
+        }
+        function closeReferralModal() {
+            document.getElementById('referral-modal').style.display = 'none';
+            clearInterval(window.refInterval);
+        }
+        function copyRefLink() {
+            navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
+            const btn = document.getElementById('t-copy-btn');
+            btn.innerText = i18n[currentLang].copied;
+            setTimeout(() => btn.innerText = i18n[currentLang].copy_btn, 2000);
+        }
 
-@app.route('/api/check-premium', methods=['GET'])
-def check_premium():
-    email = request.args.get('email')
-    pay_data = load_json(PAYMENTS_FILE)
-    if email in pay_data:
-        return _cors(jsonify({"status": "unlocked"}))
-    return _cors(jsonify({"status": "locked"}))
+        async function checkReferralStatus() {
+            if (!refId) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/referral/status?refId=${refId}`);
+                const data = await res.json();
+                const count = data.count || 0;
+                document.getElementById('t-ref-status-text').innerText = `${i18n[currentLang].ref_status_text} ${count} / 2`;
+                document.getElementById('ref-progress').style.width = `${(count / 2) * 100}%`;
+                if (count >= 2) {
+                    document.getElementById('res-paid-blur').classList.remove('blurred');
+                    document.getElementById('pay-overlay').classList.add('hidden');
+                    closeReferralModal();
+                }
+            } catch (e) {}
+        }
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+        let chatHistory = [];
+        let turnCount = 0;
+        function updateTurnIndicator() {
+            const indicator = document.getElementById('turn-indicator');
+            if (turnCount > 0) {
+                indicator.innerText = `${i18n[currentLang].turn_label} ${turnCount} / 5`;
+                indicator.style.opacity = "1";
+            } else indicator.style.opacity = "0";
+        }
+
+        function resetOracle() {
+            chatHistory = []; turnCount = 0; updateTurnIndicator();
+            document.getElementById('chat-window').innerHTML = `<div class="ai-bubble chat-bubble" style="opacity:1; transform:none;">${i18n[currentLang].chat_welcome}</div>`;
+            document.getElementById('final-report').classList.add('hidden');
+            document.getElementById('chat-window').classList.remove('hidden');
+            document.getElementById('chat-input-area').classList.remove('hidden');
+            gsap.set("#chat-input-area, #chat-window, #turn-indicator", { opacity: 1 });
+            document.getElementById('t-chat-placeholder').value = "";
+        }
+
+        async function sendMessage() {
+            const dreamInput = document.getElementById('t-chat-placeholder');
+            const dobInput = document.getElementById('t-chat-dob');
+            const sendBtn = document.getElementById('t-chat-send');
+            const content = dreamInput.value.trim();
+            const dob = dobInput.value.trim();
+
+            if (!content || sendBtn.disabled) return;
+
+            addBubble(content, 'user');
+            chatHistory.push({ "role": "user", "content": `DOB: ${dob}, Dream: ${content}` });
+            dreamInput.value = "";
+            sendBtn.disabled = true;
+
+            const thinking = addThinkingBubble();
+            const slowToast = setTimeout(() => {
+                const tip = document.createElement('div');
+                tip.className = "text-[9px] text-gray-500 uppercase tracking-widest text-center py-2 italic animate-pulse";
+                tip.innerText = i18n[currentLang].slow_thought;
+                thinking.appendChild(tip);
+            }, 10000);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lang: currentLang, messages: chatHistory, refBy: refBy })
+                });
+                clearTimeout(slowToast);
+                const result = await response.json();
+                thinking.remove(); 
+                sendBtn.disabled = false;
+
+                if (result.mode === 'question') {
+                    turnCount++;
+                    updateTurnIndicator();
+                    addBubble(result.content, 'ai');
+                    chatHistory.push({"role": "assistant", "content": result.content});
+                } else if (result.mode === 'report') {
+                    addBubble(i18n[currentLang].report_gen, 'ai');
+                    setTimeout(() => {
+                        gsap.to("#chat-input-area, #chat-window, #turn-indicator", { opacity: 0, duration: 1, onComplete: () => {
+                            document.getElementById('chat-window').classList.add('hidden');
+                            document.getElementById('chat-input-area').classList.add('hidden');
+                            document.getElementById('final-report').classList.remove('hidden');
+                            document.getElementById('res-free').innerText = result.data.free_part;
+                            document.getElementById('res-paid').innerText = result.data.paid_part;
+                            gsap.from("#final-report", { opacity: 0, y: 40, duration: 1.5 });
+                        }});
+                    }, 3000); 
+                }
+            } catch (err) { 
+                clearTimeout(slowToast);
+                thinking.remove(); 
+                sendBtn.disabled = false;
+                addBubble(i18n[currentLang].error_ether, 'ai');
+            }
+        }
+
+        function addBubble(text, side) {
+            const win = document.getElementById('chat-window');
+            const div = document.createElement('div');
+            div.className = `${side}-bubble chat-bubble`;
+            div.innerText = text;
+            win.appendChild(div);
+            gsap.to(div, { opacity: 1, y: 0, duration: 0.8 });
+            win.scrollTop = win.scrollHeight;
+            return div;
+        }
+
+        function addThinkingBubble() {
+            const win = document.getElementById('chat-window');
+            const div = document.createElement('div');
+            div.className = `ai-bubble chat-bubble flex flex-col items-start gap-2`;
+            div.innerHTML = `<div class="flex gap-2"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+            win.appendChild(div);
+            gsap.to(div, { opacity: 1, y: 0, duration: 0.8 });
+            win.scrollTop = win.scrollHeight;
+            return div;
+        }
+
+        const video = document.getElementById('hero-video');
+        if (Hls.isSupported()) { 
+            const hls = new Hls({ startLevel: -1, capLevelToPlayerSize: false }); 
+            hls.loadSource('https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8'); hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => { hls.currentLevel = hls.levels.length - 1; video.play(); });
+        }
+
+        let c = 0; const i = setInterval(() => { c++; document.getElementById('loader-count').innerText = c.toString().padStart(3, '0'); document.getElementById('loader-bar').style.transform = `scaleX(${c / 100})`; if (c >= 100) { clearInterval(i); finish(); } }, 15);
+        function finish() { renderLanguage(); initReferral(); checkReferralStatus(); gsap.to("#loader", { yPercent: -100, duration: 1.2, ease: "power4.inOut", delay: 0.5 }); gsap.to("#navbar", { opacity: 1, y: 0, duration: 1, delay: 1 }); gsap.to("#t-hero-title", { opacity: 1, y: 0, duration: 1.5, delay: 1.2 }); }
+    </script>
+</body>
+</html>
