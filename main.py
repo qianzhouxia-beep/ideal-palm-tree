@@ -1,82 +1,133 @@
-# main.py - Version: v33.2.12 (THE FINAL MIRROR FIX)
+# main.py - Version: v33.2.14 (MASTER FINAL)
 import os
+import json
 import requests
+import time
 from flask import Flask, request, jsonify, make_response, send_file
 from flask_cors import CORS
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True)
 
-# --- 核心配置区 ---
+# --- CONFIGURATION ---
 NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
-# 确认这是您在游乐场测试通过的最新 Mirror API 密钥
-NEW_API_KEY = "sk-biaE1BokgWzky0VkQwX3DuiVCThyVjIlf9BxejJSGi3U0M8j" 
+NEW_API_KEY = "sk-biaE1BokgWzky0VkQwX3DuiVCThyVjIlf9BxejJSGi3U0M8j"
 HTML_FILE = "dream_pro_landing_v33_referral.html"
+DATA_FILE = "referrals.json"
+PAYMENTS_FILE = "payments.json"
 
-def _build_cors_response(data, status=200):
-    response = make_response(jsonify(data), status)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+# Init data
+for f_path in [DATA_FILE, PAYMENTS_FILE]:
+    if not os.path.exists(f_path):
+        with open(f_path, "w") as f: json.dump({}, f)
+
+def load_json(path):
+    with open(path, "r") as f: return json.load(f)
+
+def save_json(path, data):
+    with open(path, "w") as f: json.dump(data, f)
+
+def _cors(res):
+    res.headers["Access-Control-Allow-Origin"] = "*"
+    res.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    res.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return res
+
+# --- ROUTES ---
 
 @app.route('/')
-def serve_index():
+def index():
     if os.path.exists(HTML_FILE):
         return send_file(HTML_FILE)
-    return f"<h1>Oracle Error</h1><p>File {HTML_FILE} missing.</p>", 404
+    return "<h1>Mirror Sanctum Error: HTML File Missing</h1>", 404
 
-@app.route('/api/referral/init', methods=['GET', 'POST', 'OPTIONS'])
-def init_referral():
-    return _build_cors_response({"status": "ready", "version": "v33.2.12"})
+@app.route('/api/referral/init', methods=['GET', 'OPTIONS'])
+def init_ref():
+    return _cors(jsonify({"status": "ready"}))
+
+@app.route('/api/referral', methods=['GET'])
+def manage_referral():
+    inviter_id = request.args.get('id')
+    visitor_ip = request.remote_addr
+    data = load_json(DATA_FILE)
+    if inviter_id:
+        if inviter_id not in data:
+            data[inviter_id] = {"count": 0, "ips": []}
+        if visitor_ip not in data[inviter_id]["ips"]:
+            data[inviter_id]["ips"].append(visitor_ip)
+            data[inviter_id]["count"] += 1
+            save_json(DATA_FILE, data)
+        return _cors(jsonify({"count": data[inviter_id]["count"]}))
+    return _cors(jsonify({"status": "active"}))
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
-    if request.method == 'OPTIONS':
-        return _build_cors_response({})
+    if request.method == 'OPTIONS': return _cors(make_response())
+    req_data = request.json
+    messages = req_data.get('messages', [])
+    lang = req_data.get('lang', 'zh')
     
-    data = request.json
-    messages = data.get('messages', [])
-    lang = data.get('lang', 'zh')
-    
-    system_prompt = {
-        "role": "system",
-        "content": (
-            "Analyze dreams with psychology and mysticism. "
-            "Deliver report in TWO PARTS (Part A: Analysis, Part B: Prophecy). "
-            "Ask ONE follow-up question. "
-            f"Respond in {'Chinese' if lang == 'zh' else 'English'}."
+    # Logic: User (1) -> Oracle (1) -> User (2) -> Oracle (2) -> User (3) -> Report (3)
+    user_msg_count = len([m for m in messages if m['role'] == 'user'])
+    mode = 'question' if user_msg_count < 3 else 'report'
+
+    system_content = (
+        "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
+        f"IMPORTANT: You MUST respond in {'CHINESE' if lang == 'zh' else 'ENGLISH'}. "
+    )
+    if mode == 'question':
+        system_content += "Rule: Ask exactly ONE short, provocative follow-up question to dig deeper."
+    else:
+        system_content += (
+            "Rule: Deliver a final report in TWO PARTS. "
+            "PART A: [Psychological Analysis]. PART B: [The Oracle's Prophecy]. "
+            "Separate them with the string '---PROPHECY_START---'."
         )
-    }
-    
+
     try:
         response = requests.post(
             NEW_API_BASE,
             headers={"Authorization": f"Bearer {NEW_API_KEY}", "Content-Type": "application/json"},
-            json={
-                "model": "deepseek-reasoner",
-                "messages": [system_prompt] + messages,
-                "temperature": 0.7
-            },
+            json={"model": "deepseek-reasoner", "messages": [{"role": "system", "content": system_content}] + messages, "temperature": 0.8},
             timeout=120
         )
-        
-        # --- 核心修复逻辑 ---
         res_json = response.json()
+        ai_msg = res_json['choices'][0]['message']
+        text = ai_msg.get('content') or ai_msg.get('reasoning_content') or ""
         
-        if "choices" in res_json and len(res_json["choices"]) > 0:
-            msg = res_json["choices"][0]["message"]
-            
-            # 提取内容：优先取 content，如果为空则取 reasoning_content
-            final_text = msg.get("content") or msg.get("reasoning_content") or "The Oracle is silent..."
-            
-            # 强制重构为前端网页 100% 认识的格式
-            res_json["choices"][0]["message"]["content"] = final_text
-            
-        return _build_cors_response(res_json)
-
+        if mode == 'question':
+            return _cors(jsonify({"mode": "question", "content": text}))
+        else:
+            parts = text.split('---PROPHECY_START---')
+            free = parts[0].replace('PART A:', '').strip()
+            paid = parts[1].replace('PART B:', '').strip() if len(parts) > 1 else "The destiny is veiled..."
+            return _cors(jsonify({
+                "mode": "report", 
+                "content": "The veil is lifted.", 
+                "data": {"free_part": free, "paid_part": paid}
+            }))
     except Exception as e:
-        return _build_cors_response({"error": str(e)}, 500)
+        return _cors(jsonify({"error": str(e)}), 500)
+
+@app.route('/api/gumroad/webhook', methods=['POST'])
+def gumroad_webhook():
+    gumroad_data = request.form
+    email = gumroad_data.get('email')
+    if email:
+        pay_data = load_json(PAYMENTS_FILE)
+        pay_data[email] = {"status": "paid", "timestamp": time.time()}
+        save_json(PAYMENTS_FILE, pay_data)
+        return "Success", 200
+    return "No Email Found", 400
+
+@app.route('/api/check-premium', methods=['GET'])
+def check_premium():
+    email = request.args.get('email')
+    pay_data = load_json(PAYMENTS_FILE)
+    if email in pay_data:
+        return _cors(jsonify({"status": "unlocked"}))
+    return _cors(jsonify({"status": "locked"}))
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
