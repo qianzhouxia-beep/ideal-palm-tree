@@ -11,7 +11,7 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 # --- 核心配置区 ---
 NEW_API_BASE = "https://api-tokenmaster.com/v1/chat/completions"
 # 请确保使用完整的 sk-xxxx 密钥
-NEW_API_KEY = "sk-Yb6fOVUVZHJpbMakOSdT8fPF4sUTTS1GwcJeNkGRczdm1EEK" 
+NEW_API_KEY = "sk-biaE1BokgWzky0VkQwX3DuiVCThyVjIlf9BxejJSGi3U0M8j" 
 HTML_FILE = "dream_pro_landing_v33_referral.html"
 
 def _build_cors_response(data, status=200):
