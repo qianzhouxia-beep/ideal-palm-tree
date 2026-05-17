@@ -6,12 +6,12 @@ import requests
 import time
 import uuid
 import json
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
 # --- SECURITY: Rate Limiting ---
@@ -61,6 +61,10 @@ def _cors(res):
     res.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
     res.headers["Access-Control-Allow-Headers"] = "Content-Type, X-SM-API-Key"
     return res
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
 
 def require_api_key(f):
     """验证自定义 API Key 的装饰器"""
