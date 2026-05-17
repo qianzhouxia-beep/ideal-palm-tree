@@ -170,30 +170,31 @@
                             <div class="text-[10px] text-gray-300 uppercase tracking-widest" id="t-gen-img">Generate Dream Image</div>
                         </div>
                     </div>
-                    <div class="relative pt-8 border-t border-white/10">
+                    <div class="pt-8 border-t border-white/10">
                         <h4 class="text-[10px] text-gray-300 uppercase tracking-widest mb-6 flex items-center gap-2" id="t-res-destiny">
                             <span class="text-accent text-lg">🔮</span> Eastern Destiny Path
                         </h4>
-                        <div id="res-paid-blur" class="blurred"><p id="res-paid" class="text-xl text-gray-300 font-light leading-relaxed"></p></div>
-                        <div id="pay-overlay" class="absolute inset-0 flex items-center justify-center pt-10">
-                            <div class="text-center p-10 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[32px] max-w-sm mx-auto shadow-2xl">
-                                <p class="text-xs text-gray-300 uppercase tracking-[0.2em] mb-6" id="t-unlock-msg">Unlock your full destiny path</p>
-                                <div class="flex flex-col gap-4">
-                                    <button onclick="openPayOverlay('https://apitokenmaster.gumroad.com/l/subconscious-mirror')" 
-                                       class="inline-block w-full px-10 py-5 bg-accent text-bg rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-accent/20" id="t-unlock-btn">
-                                        Unlock Full Report ($4.99)
-                                    </button>
-                                    <button onclick="showLicenseInput()" class="text-[9px] text-white/60 hover:text-white uppercase tracking-widest transition-all" id="t-have-key">Already have a license key?</button>
-                                    <div id="license-input-wrapper" class="hidden mt-4 space-y-3">
-                                        <input type="text" id="t-key-placeholder" 
-                                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:border-accent transition-all outline-none">
-                                        <button onclick="verifyLicense()" id="t-verify-btn"
-                                            class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] uppercase tracking-widest transition-all">
-                                            Verify Key
+                        <div class="relative min-h-[300px]">
+                            <div id="res-paid-blur" class="blurred"><p id="res-paid" class="text-xl text-gray-300 font-light leading-relaxed"></p></div>
+                            <div id="pay-overlay" class="absolute inset-0 flex items-center justify-center pt-10">
+                                <div class="text-center p-10 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[32px] max-w-sm mx-auto shadow-2xl">
+                                    <p class="text-xs text-gray-300 uppercase tracking-[0.2em] mb-6" id="t-unlock-msg">Unlock your full destiny path</p>
+                                    <div class="flex flex-col gap-4">
+                                        <button onclick="openPayOverlay('https://apitokenmaster.gumroad.com/l/subconscious-mirror')" 
+                                           class="inline-block w-full px-10 py-5 bg-accent text-bg rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-accent/20" id="t-unlock-btn">
+                                            Unlock Full Report ($4.99)
                                         </button>
+                                        <button onclick="showLicenseInput()" class="text-[9px] text-white/60 hover:text-white uppercase tracking-widest transition-all" id="t-have-key">Already have a license key?</button>
+                                        <div id="license-input-wrapper" class="hidden mt-4 space-y-3">
+                                            <input type="text" id="t-key-placeholder" 
+                                                class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:border-accent transition-all outline-none">
+                                            <button onclick="verifyLicense()" id="t-verify-btn"
+                                                class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] uppercase tracking-widest transition-all">
+                                                Verify Key
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                                <button onclick="openReferralModal()" class="text-[9px] text-white/60 hover:text-white uppercase tracking-widest transition-all" id="t-ref-btn">Invite 2 friends to unlock for free</button>
+                                    <button onclick="openReferralModal()" class="text-[9px] text-white/60 hover:text-white uppercase tracking-widest transition-all" id="t-ref-btn">Invite 2 friends to unlock for free</button>
                                 </div>
                             </div>
                         </div>
