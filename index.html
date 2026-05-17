@@ -111,7 +111,7 @@
 
     <!-- Hero Section -->
     <section id="hero" class="relative h-screen w-full flex items-center justify-center">
-        <video id="hero-video" class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline></video>
+        <video id="hero-video" class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline preload="auto" poster="https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g/thumbnail.jpg"></video>
         <div class="absolute inset-0 video-overlay z-10"></div>
         <div class="relative z-20 text-center px-6 pt-24 max-w-6xl">
             <span class="text-[10px] text-gray-300 uppercase tracking-[0.5em] mb-12 block" id="t-hero-eyebrow">Revealing the Unseen</span>
@@ -690,7 +690,7 @@
             hls.on(Hls.Events.MANIFEST_PARSED, () => { hls.currentLevel = hls.levels.length - 1; video.play(); });
         }
 
-        let c = 0; const i = setInterval(() => { c++; document.getElementById('loader-count').innerText = c.toString().padStart(3, '0'); document.getElementById('loader-bar').style.transform = `scaleX(${c / 100})`; if (c >= 100) { clearInterval(i); finish(); } }, 15);
+        let c = 0; const i = setInterval(() => { c++; document.getElementById('loader-count').innerText = c.toString().padStart(3, '0'); document.getElementById('loader-bar').style.transform = `scaleX(${c / 100})`; if (c >= 100) { clearInterval(i); finish(); } }, 10);
         function finish() { renderLanguage(); initReferral(); checkReferralStatus(); syncPremiumStatus(); gsap.to("#loader", { yPercent: -100, duration: 1.2, ease: "power4.inOut", delay: 0.5 }); gsap.to("#navbar", { opacity: 1, y: 0, duration: 1, delay: 1 }); gsap.to("#t-hero-title", { opacity: 1, y: 0, duration: 1.5, delay: 1.2 }); }
     </script>
 </body>
