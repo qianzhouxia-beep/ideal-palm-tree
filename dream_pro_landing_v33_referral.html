@@ -12,8 +12,8 @@
     <meta property="og:image" content="https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g/thumbnail.jpg">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
     <script src="https://app.lemonsqueezy.com/js/lemon.js" defer></script>
@@ -59,7 +59,7 @@
 
     <!-- Loading Screen -->
     <div id="loader" class="fixed inset-0 bg-bg z-[100] p-10 flex flex-col justify-between">
-        <div class="text-[10px] text-gray-500 uppercase tracking-[0.4em]">Subconscious Mirror / '26 <span class="text-accent ml-2">v33.2 Stable</span></div>
+        <div class="text-[10px] text-gray-300 uppercase tracking-[0.4em]">Subconscious Mirror / '26 <span class="text-accent ml-2">v33.2 Stable</span></div>
         <div class="flex-1 flex items-center justify-center text-5xl font-display italic" id="t-loader-word">Dream</div>
         <div class="flex justify-between items-end">
             <div id="loader-count" class="text-9xl font-display">000</div>
@@ -72,21 +72,33 @@
         <div class="relative flex flex-col items-center">
             <div class="nav-pill bg-white/5 rounded-full px-2 py-2 flex items-center gap-2 hover:bg-white/10 transition-all">
                 <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-black font-display italic text-sm" onclick="toggleStatusCard()">SM</div>
-                <div class="hidden md:flex gap-6 text-[10px] uppercase tracking-[0.2em] px-4 text-gray-400 border-r border-white/10">
+                <div class="hidden md:flex gap-6 text-[10px] uppercase tracking-[0.2em] px-4 text-gray-300 border-r border-white/10">
                     <a href="#hero" id="t-nav-home" class="hover:text-white transition-colors">Home</a>
                     <a href="#interpret" id="t-nav-oracle" class="hover:text-white transition-colors">Oracle</a>
                     <a href="#pricing" id="t-nav-pricing" class="hover:text-white transition-colors">Pricing</a>
                 </div>
-                <div class="flex items-center gap-2 px-3" onclick="toggleStatusCard()">
+                <div class="flex items-center gap-2 px-3 border-r border-white/10" onclick="toggleStatusCard()">
                     <div id="status-light" class="w-2.5 h-2.5 rounded-full bg-accent animate-pulse"></div>
                     <span class="text-[9px] text-accent uppercase tracking-widest font-bold" id="t-nav-balance">Ready</span>
                 </div>
-                <button onclick="toggleLang()" id="lang-btn" class="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white px-3 border-l border-white/10">ZH</button>
-                <a href="mailto:hi@api-tokenmaster.com" target="_blank" id="t-nav-hi" class="bg-white/10 px-6 py-3 rounded-full text-[11px] uppercase tracking-widest text-white font-bold hover:bg-white/20 transition-all">Say Hi ↗</a>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-gray-300 px-3 py-2" aria-label="Toggle menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <button onclick="toggleLang()" id="lang-btn" class="text-[10px] uppercase tracking-widest text-gray-300 hover:text-white px-3 border-l border-white/10 hidden md:block">ZH</button>
+                <a href="mailto:hi@api-tokenmaster.com" target="_blank" id="t-nav-hi" class="bg-white/10 px-6 py-3 rounded-full text-[11px] uppercase tracking-widest text-white font-bold hover:bg-white/20 transition-all hidden md:block">Say Hi ↗</a>
+            </div>
+            
+            <div id="mobile-menu" class="absolute top-full mt-4 bg-[#1a1a1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-6 min-w-[240px] shadow-2xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300 md:hidden flex flex-col gap-4">
+                <a href="#hero" id="m-nav-home" onclick="toggleMobileMenu()" class="text-[10px] uppercase tracking-[0.2em] text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="#interpret" id="m-nav-oracle" onclick="toggleMobileMenu()" class="text-[10px] uppercase tracking-[0.2em] text-gray-300 hover:text-white transition-colors">Oracle</a>
+                <a href="#pricing" id="m-nav-pricing" onclick="toggleMobileMenu()" class="text-[10px] uppercase tracking-[0.2em] text-gray-300 hover:text-white transition-colors">Pricing</a>
+                <div class="h-px bg-white/10 w-full"></div>
+                <button onclick="toggleLang(); toggleMobileMenu()" class="text-[10px] uppercase tracking-widest text-gray-300 hover:text-white text-left" id="m-lang-btn">Switch to ZH</button>
+                <a href="mailto:hi@api-tokenmaster.com" target="_blank" class="text-[10px] uppercase tracking-widest text-white font-bold" id="m-nav-hi">Say Hi ↗</a>
             </div>
             
             <div id="status-card" class="absolute top-full mt-4 bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 min-w-[240px] shadow-2xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300">
-                <h5 class="text-[10px] text-gray-500 uppercase tracking-widest mb-4" id="t-sc-title">Oracle Engine</h5>
+                <h5 class="text-[10px] text-gray-300 uppercase tracking-widest mb-4" id="t-sc-title">Oracle Engine</h5>
                 <div class="text-xl font-display italic mb-1 text-white">DeepSeek-R1 (Reasoner)</div>
                 <p class="text-[9px] text-accent uppercase tracking-widest mb-6" id="t-sc-sync">Quantum Logic Sync: Active</p>
                 <div class="pt-4 border-t border-white/5">
@@ -101,11 +113,11 @@
         <video id="hero-video" class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline></video>
         <div class="absolute inset-0 video-overlay z-10"></div>
         <div class="relative z-20 text-center px-6 pt-24 max-w-6xl">
-            <span class="text-[10px] text-gray-500 uppercase tracking-[0.5em] mb-12 block" id="t-hero-eyebrow">Revealing the Unseen</span>
+            <span class="text-[10px] text-gray-300 uppercase tracking-[0.5em] mb-12 block" id="t-hero-eyebrow">Revealing the Unseen</span>
             <h1 id="t-hero-title" class="text-7xl md:text-[9.5rem] font-display italic leading-[0.8] tracking-tighter text-white mb-10 opacity-0">
                 Subconscious <br> <span class="accent-gradient pr-4">Mirror</span>
             </h1>
-            <p class="text-lg md:text-xl text-gray-400 font-light max-w-xl mx-auto mb-16" id="t-hero-desc">
+            <p class="text-lg md:text-xl text-gray-300 font-light max-w-xl mx-auto mb-16" id="t-hero-desc">
                 A <span class="text-white font-display italic">Dream Oracle</span> providing ancient wisdom in a modern digital age.
             </p>
             <button onclick="gsap.to(window, {duration: 1.5, scrollTo: '#interpret', ease: 'power4.inOut'})" 
@@ -121,7 +133,7 @@
             <div class="text-center mb-20">
                 <h2 class="text-4xl md:text-6xl font-display italic text-white mb-6" id="t-interpret-whisper">Whisper your dream</h2>
                 <div class="flex flex-col gap-2">
-                    <p class="text-gray-500 text-[9px] uppercase tracking-widest" id="t-interpret-akashic">Connect to the Akashic records below</p>
+                    <p class="text-gray-300 text-[9px] uppercase tracking-widest" id="t-interpret-akashic">Connect to the Akashic records below</p>
                     <div id="turn-indicator" class="text-[9px] text-accent font-bold uppercase tracking-widest opacity-0">Connection 0 / 5</div>
                 </div>
             </div>
@@ -135,7 +147,7 @@
                     <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
                         <input type="text" id="t-chat-dob" class="mystic-input w-full md:w-64 p-4 text-sm text-white placeholder-gray-500" placeholder="DOB (YYYY-MM-DD)">
                         <div class="flex gap-4 w-full md:w-auto">
-                            <button onclick="resetOracle()" id="t-oracle-reset" class="flex-1 md:flex-none px-8 py-4 bg-white/5 border border-white/10 text-gray-400 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Reset</button>
+                            <button onclick="resetOracle()" id="t-oracle-reset" class="flex-1 md:flex-none px-8 py-4 bg-white/5 border border-white/10 text-gray-300 rounded-full font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Reset</button>
                             <button onclick="sendMessage()" id="t-chat-send" class="flex-[2] md:flex-none px-12 py-4 bg-white text-black rounded-full font-bold text-[11px] md:text-xs uppercase tracking-widest hover:scale-105 transition-all">Send Message</button>
                         </div>
                     </div>
@@ -147,7 +159,7 @@
                         <h2 class="text-4xl md:text-6xl font-display italic text-white" id="t-destiny-report">Destiny Report</h2>
                     </div>
                     <div class="space-y-4">
-                        <h4 class="text-[10px] text-gray-500 uppercase tracking-widest flex items-center gap-2" id="t-res-psych">
+                        <h4 class="text-[10px] text-gray-300 uppercase tracking-widest flex items-center gap-2" id="t-res-psych">
                             <span class="text-accent text-lg">🧠</span> Psychology Analysis
                         </h4>
                         <p id="res-free" class="text-xl text-gray-300 font-light leading-relaxed"></p>
@@ -155,40 +167,39 @@
                     <div class="w-full aspect-video bg-white/5 rounded-3xl flex items-center justify-center border border-white/10 group cursor-pointer overflow-hidden relative">
                         <div id="image-placeholder" class="text-center">
                             <div class="text-accent text-3xl mb-2">🎨</div>
-                            <div class="text-[10px] text-gray-500 uppercase tracking-widest" id="t-gen-img">Generate Dream Image</div>
+                            <div class="text-[10px] text-gray-300 uppercase tracking-widest" id="t-gen-img">Generate Dream Image</div>
                         </div>
                     </div>
                     <div class="relative pt-8 border-t border-white/10">
-                        <h4 class="text-[10px] text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2" id="t-res-destiny">
+                        <h4 class="text-[10px] text-gray-300 uppercase tracking-widest mb-6 flex items-center gap-2" id="t-res-destiny">
                             <span class="text-accent text-lg">🔮</span> Eastern Destiny Path
                         </h4>
                         <div id="res-paid-blur" class="blurred"><p id="res-paid" class="text-xl text-gray-300 font-light leading-relaxed"></p></div>
                         <div id="pay-overlay" class="absolute inset-0 flex items-center justify-center pt-10">
                             <div class="text-center p-10 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[32px] max-w-sm mx-auto shadow-2xl">
-                                <p class="text-xs text-gray-400 uppercase tracking-[0.2em] mb-6" id="t-unlock-msg">Unlock your full destiny path</p>
+                                <p class="text-xs text-gray-300 uppercase tracking-[0.2em] mb-6" id="t-unlock-msg">Unlock your full destiny path</p>
                                 <div class="flex flex-col gap-4">
                                     <button onclick="openPayOverlay('https://apitokenmaster.gumroad.com/l/subconscious-mirror')" 
                                        class="inline-block w-full px-10 py-5 bg-accent text-bg rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-accent/20" id="t-unlock-btn">
                                         Unlock Full Report ($4.99)
                                     </button>
-                                    <div id="license-area" class="mt-2">
-                                        <button onclick="showLicenseInput()" class="text-[9px] text-white/40 hover:text-white uppercase tracking-widest transition-all" id="t-have-key">Already have a license key?</button>
-                                        <div id="license-input-wrapper" class="hidden mt-4 space-y-3">
-                                            <input type="text" id="t-key-placeholder" 
-                                                class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:border-accent transition-all outline-none">
-                                            <button onclick="verifyLicense()" id="t-verify-btn"
-                                                class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] uppercase tracking-widest transition-all">
-                                                Verify Key
-                                            </button>
-                                        </div>
+                                    <button onclick="showLicenseInput()" class="text-[9px] text-white/60 hover:text-white uppercase tracking-widest transition-all" id="t-have-key">Already have a license key?</button>
+                                    <div id="license-input-wrapper" class="hidden mt-4 space-y-3">
+                                        <input type="text" id="t-key-placeholder" 
+                                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:border-accent transition-all outline-none">
+                                        <button onclick="verifyLicense()" id="t-verify-btn"
+                                            class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] uppercase tracking-widest transition-all">
+                                            Verify Key
+                                        </button>
                                     </div>
-                                    <button onclick="openReferralModal()" class="text-[9px] text-white/40 hover:text-white uppercase tracking-widest transition-all" id="t-ref-btn">Invite 2 friends to unlock for free</button>
+                                </div>
+                                <button onclick="openReferralModal()" class="text-[9px] text-white/60 hover:text-white uppercase tracking-widest transition-all" id="t-ref-btn">Invite 2 friends to unlock for free</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="text-center pt-8">
-                        <button onclick="resetOracle()" class="text-[9px] text-gray-500 uppercase tracking-[0.4em] hover:text-white transition-all underline underline-offset-8" id="t-oracle-new">Begin New Journey</button>
+                        <button onclick="resetOracle()" class="text-[9px] text-gray-300 uppercase tracking-[0.4em] hover:text-white transition-all underline underline-offset-8" id="t-oracle-new">Begin New Journey</button>
                     </div>
                 </div>
             </div>
@@ -199,12 +210,12 @@
     <section id="pricing" class="relative py-32 px-6 border-t border-white/5 bg-bg">
         <div class="max-w-6xl mx-auto text-center">
             <h2 class="text-4xl md:text-7xl font-display italic text-white mb-6" id="t-pricing-title">Invest in your <span class="accent-gradient">self</span></h2>
-            <p class="text-gray-500 text-xs uppercase tracking-widest mb-24" id="t-pricing-sub">Choose your path to enlightenment</p>
+            <p class="text-gray-300 text-xs uppercase tracking-widest mb-24" id="t-pricing-sub">Choose your path to enlightenment</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="glass-card p-12 flex flex-col items-center">
-                    <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-6" id="t-tier1-name">The Spark</span>
+                    <span class="text-[10px] text-gray-300 uppercase tracking-widest mb-6" id="t-tier1-name">The Spark</span>
                     <div class="text-5xl font-display italic mb-8">$4.99</div>
-                    <ul class="text-gray-400 text-sm space-y-4 mb-12">
+                    <ul class="text-gray-300 text-sm space-y-4 mb-12">
                         <li id="t-tier1-f1">1 Deep Interpretation</li>
                         <li id="t-tier1-f2">Eastern Wisdom Alignment</li>
                         <li id="t-tier1-f3" class="text-accent text-[9px] uppercase tracking-widest font-bold">Powered by DeepSeek-R1</li>
@@ -213,9 +224,9 @@
                 </div>
                 <div class="glass-card p-12 flex flex-col items-center relative card-active">
                     <div class="absolute -top-4 bg-accent text-bg text-[10px] font-bold px-6 py-2 rounded-full uppercase tracking-widest" id="t-pricing-pop">Most Popular</div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest mb-6" id="t-tier2-name">The Seeker</span>
+                    <span class="text-[10px] text-gray-300 uppercase tracking-widest mb-6" id="t-tier2-name">The Seeker</span>
                     <div class="text-5xl font-display italic mb-8">$12.99</div>
-                    <ul class="text-gray-400 text-sm space-y-4 mb-12">
+                    <ul class="text-gray-300 text-sm space-y-4 mb-12">
                         <li id="t-tier2-f1">5 Deep Interpretations</li>
                         <li id="t-tier2-f2">Personalized Destiny Map</li>
                         <li id="t-tier2-f3" class="text-accent text-[9px] uppercase tracking-widest font-bold">Powered by DeepSeek-R1</li>
@@ -223,9 +234,9 @@
                     <button onclick="selectPlan(1, 'https://tokenmasterglobal.lemonsqueezy.com/checkout/buy/c85966e2-beec-4c3f-870e-98c567ca8bd5')" class="plan-btn" id="t-select-1">Select Plan</button>
                 </div>
                 <div class="glass-card p-12 flex flex-col items-center">
-                    <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-6" id="t-tier3-name">The Oracle</span>
+                    <span class="text-[10px] text-gray-300 uppercase tracking-widest mb-6" id="t-tier3-name">The Oracle</span>
                     <div class="text-5xl font-display italic mb-8">$29.99</div>
-                    <ul class="text-gray-400 text-sm space-y-4 mb-12">
+                    <ul class="text-gray-300 text-sm space-y-4 mb-12">
                         <li id="t-tier3-f1">Unlimited Monthly Access</li>
                         <li id="t-tier3-f2">DeepSeek R1 High-Priority</li>
                         <li id="t-tier3-f3" class="text-accent text-[9px] uppercase tracking-widest font-bold">Nous Hermes 3 Integration</li>
@@ -237,11 +248,11 @@
     </section>
 
     <!-- Referral Modal -->
-    <div id="referral-modal" class="modal" onclick="if(event.target === this) closeReferralModal()">
+    <div id="referral-modal" class="modal" onclick="if(event.target === this) closeReferralModal()" role="dialog" aria-modal="true" aria-labelledby="t-ref-modal-title">
         <div class="modal-content custom-scrollbar text-center">
-            <button onclick="closeReferralModal()" class="absolute top-8 right-8 text-gray-400 hover:text-white text-2xl">✕</button>
+            <button onclick="closeReferralModal()" class="absolute top-8 right-8 text-gray-300 hover:text-white text-2xl" aria-label="Close modal">✕</button>
             <h3 class="font-display italic text-4xl text-white mb-6" id="t-ref-modal-title">Pass the Spark</h3>
-            <p class="text-gray-400 text-sm mb-10 leading-relaxed" id="t-ref-modal-desc">Share this magical mirror with 2 friends. When they begin their journey, your full destiny path will be revealed for free.</p>
+            <p class="text-gray-300 text-sm mb-10 leading-relaxed" id="t-ref-modal-desc">Share this magical mirror with 2 friends. When they begin their journey, your full destiny path will be revealed for free.</p>
             
             <div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-8 flex items-center justify-between">
                 <code id="ref-link" class="text-xs text-accent truncate mr-4">Loading...</code>
@@ -249,7 +260,7 @@
             </div>
 
             <div class="flex flex-col items-center">
-                <div id="t-ref-status-text" class="text-[10px] text-gray-500 uppercase tracking-widest mb-4">Journeyers joined: 0 / 2</div>
+                <div id="t-ref-status-text" class="text-[10px] text-gray-300 uppercase tracking-widest mb-4">Journeyers joined: 0 / 2</div>
                 <div class="w-full max-w-xs h-1 bg-white/10 rounded-full overflow-hidden">
                     <div id="ref-progress" class="h-full bg-accent transition-all duration-1000" style="width: 0%"></div>
                 </div>
@@ -258,28 +269,29 @@
     </div>
 
     <!-- Terms Modal -->
-    <div id="terms-modal" class="modal" onclick="if(event.target === this) closeModal()">
+    <div id="terms-modal" class="modal" onclick="if(event.target === this) closeModal()" role="dialog" aria-modal="true" aria-labelledby="t-modal-title">
         <div class="modal-content custom-scrollbar">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-gray-400 hover:text-white text-2xl">✕</button>
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-gray-300 hover:text-white text-2xl" aria-label="Close modal">✕</button>
             <div class="flex flex-col h-full">
                 <h3 class="font-display italic text-4xl text-white mb-10" id="t-modal-title">USAGE TERMS</h3>
-                <div id="modal-text" class="custom-scrollbar text-gray-400 text-sm leading-relaxed space-y-6"></div>
+                <div id="modal-text" class="custom-scrollbar text-gray-300 text-sm leading-relaxed space-y-6"></div>
             </div>
         </div>
     </div>
 
     <footer class="py-24 text-center bg-bg border-t border-white/5">
-        <div class="flex justify-center gap-12 mb-16 text-[11px] uppercase tracking-[0.4em] text-gray-400 font-bold">
+        <div class="flex justify-center gap-12 mb-16 text-[11px] uppercase tracking-[0.4em] text-gray-300 font-bold">
             <button onclick="openModal('terms')" id="t-footer-terms">USAGE TERMS</button>
             <button onclick="openModal('privacy')" id="t-footer-privacy">PRIVACY POLICY</button>
         </div>
         <div class="text-7xl md:text-[10rem] font-display italic text-white/[0.03] mb-12">Subconscious Mirror</div>
-        <p class="text-gray-700 text-[10px] uppercase tracking-[0.5em]" id="t-footer-copy">&copy; 2026 TokenMaster Global. All rights reserved. <span class="ml-4 opacity-30 text-[8px]">v33.2 Stable</span></p>
+        <p class="text-gray-500 text-[10px] uppercase tracking-[0.5em]" id="t-footer-copy">&copy; 2026 TokenMaster Global. All rights reserved. <span class="ml-4 opacity-50 text-[8px]">v34.0.0 PRO STABLE</span></p>
     </footer>
 
     <script>
         let currentLang = 'en';
         const API_BASE = window.location.origin;
+        const SM_API_KEY = "sm-secret-2026@Mirror"; // Matches Zeabur Env Var for security
         let refId = localStorage.getItem('sm_ref_id') || null;
         const urlParams = new URLSearchParams(window.location.search);
         const refBy = urlParams.get('ref');
@@ -364,7 +376,10 @@
         async function initReferral() {
             if (!refId) {
                 try {
-                    const res = await fetch(`${API_BASE}/api/referral/init`, { method: 'POST' });
+                    const res = await fetch(`${API_BASE}/api/referral/init`, { 
+                        method: 'POST',
+                        headers: { 'X-SM-API-Key': SM_API_KEY }
+                    });
                     const data = await res.json();
                     refId = data.refId;
                     localStorage.setItem('sm_ref_id', refId);
@@ -377,7 +392,10 @@
                 try {
                     await fetch(`${API_BASE}/api/referral/click`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-SM-API-Key': SM_API_KEY
+                        },
                         body: JSON.stringify({ refBy: refBy })
                     });
                 } catch (e) { console.error("Ref click failed"); }
@@ -393,8 +411,28 @@
                     else el.innerHTML = t[key];
                 }
             });
+
+            // Update mobile menu items
+            document.getElementById('m-nav-home').innerText = t.nav_home;
+            document.getElementById('m-nav-oracle').innerText = t.nav_oracle;
+            document.getElementById('m-nav-pricing').innerText = t.nav_pricing;
+            document.getElementById('m-nav-hi').innerText = t.nav_hi;
+            document.getElementById('m-lang-btn').innerText = currentLang === 'en' ? 'Switch to ZH' : '切换至英文';
+
             document.getElementById('lang-btn').innerText = currentLang === 'en' ? 'ZH' : 'EN';
+            document.documentElement.lang = currentLang;
+            document.title = currentLang === 'en' ? "Subconscious Mirror | Premium AI Dream Oracle" : "潜意识之镜 | 顶级 AI 解梦神谕";
             updateTurnIndicator();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('opacity-0');
+            menu.classList.toggle('opacity-100');
+            menu.classList.toggle('translate-y-2');
+            menu.classList.toggle('translate-y-0');
+            menu.classList.toggle('pointer-events-none');
+            menu.classList.toggle('pointer-events-auto');
         }
 
         function toggleLang() { currentLang = currentLang === 'en' ? 'zh' : 'en'; renderLanguage(); }
@@ -437,25 +475,59 @@
         }
 
         async function checkReferralStatus() {
-            // Check local premium status first
-            if (localStorage.getItem('sm_premium') === 'true') {
-                document.getElementById('res-paid-blur').classList.remove('blurred');
-                document.getElementById('pay-overlay').classList.add('hidden');
-                return;
-            }
             if (!refId) return;
             try {
-                const res = await fetch(`${API_BASE}/api/referral/status?refId=${refId}`);
+                const res = await fetch(`${API_BASE}/api/referral/status?refId=${refId}`, {
+                    headers: { 'X-SM-API-Key': SM_API_KEY }
+                });
+                if (!res.ok) throw new Error("Status check failed");
                 const data = await res.json();
                 const count = data.count || 0;
+                
+                // Update UI based on backend data
                 document.getElementById('t-ref-status-text').innerText = `${i18n[currentLang].ref_status_text} ${count} / 2`;
                 document.getElementById('ref-progress').style.width = `${(count / 2) * 100}%`;
-                if (count >= 2) {
+                
+                if (count >= 2 || data.premium) {
+                    localStorage.setItem('sm_premium', 'true');
                     document.getElementById('res-paid-blur').classList.remove('blurred');
                     document.getElementById('pay-overlay').classList.add('hidden');
-                    closeReferralModal();
+                    if (document.getElementById('referral-modal').style.display === 'flex') closeReferralModal();
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Referral sync flicker", e);
+                // Fallback to local storage if backend is unreachable but only for UX
+                if (localStorage.getItem('sm_premium') === 'true') {
+                    document.getElementById('res-paid-blur').classList.remove('blurred');
+                    document.getElementById('pay-overlay').classList.add('hidden');
+                }
+            }
+        }
+
+        async function syncPremiumStatus() {
+            const email = localStorage.getItem('sm_email');
+            if (!email) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/check-premium?email=${email}`, {
+                    headers: { 'X-SM-API-Key': SM_API_KEY }
+                });
+                const data = await res.json();
+                if (data.status === 'unlocked') {
+                    localStorage.setItem('sm_premium', 'true');
+                    document.getElementById('res-paid-blur').classList.remove('blurred');
+                    document.getElementById('pay-overlay').classList.add('hidden');
+                } else {
+                    localStorage.removeItem('sm_premium');
+                }
+            } catch (e) { console.warn("Identity sync deferred"); }
+        }
+
+        function cleanOracleText(text) {
+            if (!text) return "";
+            return text.replace(/PART [A-Z]:/gi, '')
+                       .replace(/---PROPHECY_START---/gi, '')
+                       .replace(/\[.*?\]/g, '') // 移除 [心理学解析] 等标签
+                       .trim();
         }
 
         let chatHistory = [];
@@ -484,7 +556,10 @@
             try {
                 const res = await fetch(`${API_BASE}/api/verify-license`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-SM-API-Key': SM_API_KEY
+                    },
                     body: JSON.stringify({ license_key: key })
                 });
                 const data = await res.json();
@@ -534,14 +609,18 @@
             const thinking = addThinkingBubble();
             const slowToast = setTimeout(() => {
                 const tip = document.createElement('div');
-                tip.className = "text-[9px] text-gray-500 uppercase tracking-widest text-center py-2 italic animate-pulse";
+                tip.className = "text-[9px] text-gray-300 uppercase tracking-widest text-center py-2 italic animate-pulse";
                 tip.innerText = i18n[currentLang].slow_thought;
                 thinking.appendChild(tip);
             }, 10000);
 
             try {
                 const response = await fetch(`${API_BASE}/api/chat`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', 
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-SM-API-Key': SM_API_KEY
+                    },
                     body: JSON.stringify({ lang: currentLang, messages: chatHistory, refBy: refBy })
                 });
                 clearTimeout(slowToast);
@@ -552,8 +631,9 @@
                 if (result.mode === 'question') {
                     turnCount++;
                     updateTurnIndicator();
-                    addBubble(result.content, 'ai');
-                    chatHistory.push({"role": "assistant", "content": result.content});
+                    const cleanText = cleanOracleText(result.content);
+                    addBubble(cleanText, 'ai');
+                    chatHistory.push({"role": "assistant", "content": cleanText});
                 } else if (result.mode === 'report') {
                     addBubble(i18n[currentLang].report_gen, 'ai');
                     setTimeout(() => {
@@ -561,8 +641,8 @@
                             document.getElementById('chat-window').classList.add('hidden');
                             document.getElementById('chat-input-area').classList.add('hidden');
                             document.getElementById('final-report').classList.remove('hidden');
-                            document.getElementById('res-free').innerText = result.data.free_part;
-                            document.getElementById('res-paid').innerText = result.data.paid_part;
+                            document.getElementById('res-free').innerText = cleanOracleText(result.data.free_part);
+                            document.getElementById('res-paid').innerText = cleanOracleText(result.data.paid_part);
                             gsap.from("#final-report", { opacity: 0, y: 40, duration: 1.5 });
                         }});
                     }, 3000); 
@@ -571,7 +651,12 @@
                 clearTimeout(slowToast);
                 thinking.remove(); 
                 sendBtn.disabled = false;
-                addBubble(i18n[currentLang].error_ether, 'ai');
+                const errDiv = addBubble(i18n[currentLang].error_ether, 'ai');
+                const retryBtn = document.createElement('button');
+                retryBtn.className = "mt-4 text-[9px] uppercase tracking-widest bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-all";
+                retryBtn.innerText = currentLang === 'en' ? "Retry Connection" : "重试连接";
+                retryBtn.onclick = () => { errDiv.remove(); sendMessage(); };
+                errDiv.appendChild(retryBtn);
             }
         }
 
@@ -605,7 +690,7 @@
         }
 
         let c = 0; const i = setInterval(() => { c++; document.getElementById('loader-count').innerText = c.toString().padStart(3, '0'); document.getElementById('loader-bar').style.transform = `scaleX(${c / 100})`; if (c >= 100) { clearInterval(i); finish(); } }, 15);
-        function finish() { renderLanguage(); initReferral(); checkReferralStatus(); gsap.to("#loader", { yPercent: -100, duration: 1.2, ease: "power4.inOut", delay: 0.5 }); gsap.to("#navbar", { opacity: 1, y: 0, duration: 1, delay: 1 }); gsap.to("#t-hero-title", { opacity: 1, y: 0, duration: 1.5, delay: 1.2 }); }
+        function finish() { renderLanguage(); initReferral(); checkReferralStatus(); syncPremiumStatus(); gsap.to("#loader", { yPercent: -100, duration: 1.2, ease: "power4.inOut", delay: 0.5 }); gsap.to("#navbar", { opacity: 1, y: 0, duration: 1, delay: 1 }); gsap.to("#t-hero-title", { opacity: 1, y: 0, duration: 1.5, delay: 1.2 }); }
     </script>
 </body>
 </html>
