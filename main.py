@@ -168,11 +168,18 @@ def chat():
     user_msg_count = len([m for m in messages if m['role'] == 'user'])
     mode = 'question' if user_msg_count < 5 else 'report'
 
+    lang_instruction = "CHINESE (Simplified)" if lang == 'zh' else "ENGLISH"
     warning_msg = "再这样我就生气了😡！" if lang == 'zh' else "Don't make me angry! 😡"
+    
     system_content = (
         "You are a Mysterious Dream Oracle. Analyze dreams with psychology and mysticism. "
         "Maintain a vibe of ancient mystery but be 'smart' and witty. "
-        "IMPORTANT: You MUST respond in {'CHINESE' if lang == 'zh' else 'ENGLISH'}. "
+        f"CRITICAL: You MUST respond EXCLUSIVELY in {lang_instruction}. "
+        "If the user provides very short, lazy, or nonsensical input (like just a single number, letter, or emoji), "
+        "do not be overly solemn. Respond with wit, gentle irony, or humor while staying in character as a cryptic sage. "
+        "Acknowledge their 'minimalist' approach (e.g., 'A dream as brief as a single breath...', 'You are being stingy with your subconscious treasures...') "
+        "before asking a provocative follow-up. "
+        f"If they are being persistent with nonsense or laziness, you can end with a humorous warning like '{warning_msg}'."
     )
     if mode == 'question':
         system_content += "Rule: Ask exactly ONE short, provocative follow-up question to dig deeper."
